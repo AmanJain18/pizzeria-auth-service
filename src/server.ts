@@ -1,19 +1,20 @@
 import app from './app';
 import { Config } from './config';
+import logger from './config/logger';
 
 const startServer = () => {
     const PORT = Config.PORT;
 
     try {
         app.listen(PORT, () => {
-            // eslint-disable-next-line no-console
-            console.log(`Server is running on port ${PORT}`);
+            logger.info(`Server is running on port ${PORT}`);
         });
     } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
+        if (err instanceof Error) {
+            logger.error(err.message);
+            setTimeout(() => process.exit(1), 1000);
+        }
     }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
 startServer();

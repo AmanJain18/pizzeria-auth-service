@@ -3,7 +3,6 @@ import { validationResult } from 'express-validator';
 import { RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
 import { Logger } from 'winston';
-import createHttpError from 'http-errors';
 
 export class AuthController {
     constructor(
@@ -33,12 +32,6 @@ export class AuthController {
             email,
             password: '******',
         });
-
-        if (!email || !password || !firstName || !lastName) {
-            const error = createHttpError(400, 'Missing required fields');
-            next(error);
-            return;
-        }
         try {
             const user = await this.userService.registerUser({
                 firstName,

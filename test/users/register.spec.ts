@@ -123,7 +123,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'random',
+                password: 'password',
             };
             // Act
             await request(app).post('/auth/register').send(userData);
@@ -242,7 +242,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: ' test@gmail.com ',
-                password: 'secret',
+                password: 'password',
             };
             // Act
             await request(app).post('/auth/register').send(userData);
@@ -252,6 +252,27 @@ describe('POST /auth/register', () => {
             const users = await userRepository.find();
             const user = users[0];
             expect(user.email).toBe('test@gmail.com');
+        });
+        it('should return status code 400 if email format is invalid', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'testgmail.com', // Invalid email format
+                password: 'secret',
+            };
+            // Act
+            const response: {
+                statusCode: number;
+                body: { errors: { msg: string }[] };
+            } = await request(app).post('/auth/register').send(userData);
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors[0].msg).toBe('Invalid email');
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
         });
     });
 });

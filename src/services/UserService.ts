@@ -13,12 +13,14 @@ export class UserService {
         const userExist = await this.userRepository.findOne({
             where: { email: email },
         });
+        // If the user exists, throw an error
         if (userExist) {
             const error = createHttpError(400, 'User already exists');
             throw error;
         }
-        // Hashing the password
+        // Number of salt rounds
         const saltRounds = 10;
+        // Hashing the password
         const hashPassword = await bcrypt.hash(password, saltRounds);
         // Save user data to the database
         try {
@@ -30,6 +32,7 @@ export class UserService {
                 role: Roles.CUSTOMER,
             });
         } catch (err) {
+            // If an error occurs while saving, throw an error
             const error = createHttpError(500, 'Error saving user data');
             throw error;
         }

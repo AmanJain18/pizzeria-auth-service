@@ -14,7 +14,7 @@ describe('POST /auth/register', () => {
     });
 
     beforeEach(async () => {
-        // This will clear the database before each test (Truncate the database)
+        // This will clear the database before each test (Truncate/Drop and synchronize the database)
         await connection.dropDatabase();
         await connection.synchronize();
     });
@@ -24,14 +24,14 @@ describe('POST /auth/register', () => {
         await connection.destroy();
     });
 
-    describe('given all fields', () => {
+    describe('Successful Registration', () => {
         it('should return status code 201', async () => {
             // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'test1234',
             };
             // Act
             const response = await request(app)
@@ -160,7 +160,7 @@ describe('POST /auth/register', () => {
         });
     });
 
-    describe('missing fields', () => {
+    describe('Registration with Missing Fields', () => {
         it('should return status code 400 if email is missing', async () => {
             // Arrange
             const userData = {

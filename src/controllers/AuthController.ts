@@ -16,7 +16,9 @@ export class AuthController {
         res: Response,
         next: NextFunction,
     ) {
+        // Validate the request
         const result = validationResult(req);
+        // If there are errors, return them
         if (!result.isEmpty()) {
             res.status(400).json({
                 errors: result.array(),
@@ -24,6 +26,7 @@ export class AuthController {
             return;
         }
         const { firstName, lastName, email, password } = req.body;
+        // Log the request
         this.logger.debug('New request to register a user', {
             firstName,
             lastName,

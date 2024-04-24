@@ -23,6 +23,10 @@ export default checkSchema({
         errorMessage: 'Password is required',
         notEmpty: true,
         trim: true,
+        isLength: {
+            errorMessage: 'Password must be at least 8 characters long',
+            options: { min: 8 },
+        },
     },
 });
 

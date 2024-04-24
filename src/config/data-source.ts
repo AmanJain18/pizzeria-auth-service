@@ -10,8 +10,8 @@ export const AppDataSource = new DataSource({
     username: Config.DB_USERNAME,
     password: Config.DB_PASSWORD,
     database: Config.DB_NAME,
-    synchronize:
-        Config.NODE_ENV === 'development' || Config.NODE_ENV === 'test',
+    // This will only synchronize the database in development and test environments, not in production. Also, it is not recommended to use synchronize in production.
+    synchronize: false,
     logging: false,
     entities: [User],
     migrations: [],

@@ -3,7 +3,7 @@ import app from '../../src/app';
 import { User } from '../../src/entity/User';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/config/data-source';
-import { truncateTables } from '../utils/index';
+import { Roles } from '../../src/constants';
 
 describe('POST /auth/register', () => {
     // This will hold the database connection
@@ -15,7 +15,8 @@ describe('POST /auth/register', () => {
 
     beforeEach(async () => {
         // This will clear the database before each test (Truncate the database)
-        await truncateTables(connection);
+        await connection.dropDatabase();
+        await connection.synchronize();
     });
 
     afterAll(async () => {
@@ -91,12 +92,29 @@ describe('POST /auth/register', () => {
                 .post('/auth/register')
                 .send(userData);
             // Assert
-            // expect(response.body).toHaveProperty('id');
-            const repository = connection.getRepository(User);
-            const users = await repository.find();
+            expect(response.body).toHaveProperty('id');
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
             expect((response.body as Record<string, string>).id).toBe(
                 users[0].id,
             );
+        });
+
+        it('should assign a customer role to register user', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'password',
+            };
+            // Act
+            await request(app).post('/auth/register').send(userData);
+            // Assert
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users[0]).toHaveProperty('role');
+            expect(users[0].role).toBe(Roles.CUSTOMER);
         });
     });
 });

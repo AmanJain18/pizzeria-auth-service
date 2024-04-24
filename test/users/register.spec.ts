@@ -175,6 +175,10 @@ describe('POST /auth/register', () => {
                 .send(userData);
             // Assert
             expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(
+                (response.body as Record<string, string>).errors.length,
+            ).toBeGreaterThan(0);
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
             expect(users).toHaveLength(0);
@@ -291,6 +295,32 @@ describe('POST /auth/register', () => {
             const userRepository = connection.getRepository(User);
             const users = await userRepository.find();
             expect(users).toHaveLength(0);
+        });
+        it('should handle email case sensitivity', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'password',
+            };
+            await request(app).post('/auth/register').send(userData);
+
+            const userData2 = {
+                firstName: 'Jane',
+                lastName: 'Doe',
+                email: 'Test@Gmail.com', // Different case
+                password: 'password',
+            };
+            // Act
+            const response = await request(app)
+                .post('/auth/register')
+                .send(userData2);
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(1);
         });
     });
 });

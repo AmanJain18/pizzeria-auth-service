@@ -15,6 +15,7 @@ export default checkSchema({
         errorMessage: 'Email is required',
         notEmpty: true,
         trim: true,
+        toLowerCase: true,
         isEmail: {
             errorMessage: 'Invalid email',
         },

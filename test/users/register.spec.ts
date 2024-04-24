@@ -31,7 +31,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'test1234',
+                password: 'Test@1234',
             };
             // Act
             const response = await request(app)
@@ -47,7 +47,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             const response = await request(app)
@@ -66,7 +66,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             await request(app).post('/auth/register').send(userData);
@@ -85,7 +85,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             const response = await request(app)
@@ -106,7 +106,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             await request(app).post('/auth/register').send(userData);
@@ -123,7 +123,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             await request(app).post('/auth/register').send(userData);
@@ -143,7 +143,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Create a user with the same email
             const userRepository = connection.getRepository(User);
@@ -167,7 +167,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: '',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             const response = await request(app)
@@ -189,7 +189,7 @@ describe('POST /auth/register', () => {
                 firstName: '',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             const response = await request(app)
@@ -207,7 +207,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: '',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             const response = await request(app)
@@ -246,7 +246,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: ' test@gmail.com ',
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             await request(app).post('/auth/register').send(userData);
@@ -263,7 +263,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'testgmail.com', // Invalid email format
-                password: 'secret',
+                password: 'Test@1234',
             };
             // Act
             const response: {
@@ -278,13 +278,13 @@ describe('POST /auth/register', () => {
             const users = await userRepository.find();
             expect(users).toHaveLength(0);
         });
-        it('should return status code 400 if password is too weak', async () => {
+        it('should return status code 400 if password does not meet complexity requirements', async () => {
             // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'test',
+                password: 'testpassword', // Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character
             };
             // Act
             const response = await request(app)
@@ -302,7 +302,7 @@ describe('POST /auth/register', () => {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
-                password: 'password',
+                password: 'Test@1234',
             };
             await request(app).post('/auth/register').send(userData);
 
@@ -310,7 +310,7 @@ describe('POST /auth/register', () => {
                 firstName: 'Jane',
                 lastName: 'Doe',
                 email: 'Test@Gmail.com', // Different case
-                password: 'password',
+                password: 'Test@1234',
             };
             // Act
             const response = await request(app)

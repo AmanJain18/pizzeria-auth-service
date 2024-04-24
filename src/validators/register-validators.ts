@@ -28,6 +28,16 @@ export default checkSchema({
             errorMessage: 'Password must be at least 8 characters long',
             options: { min: 8 },
         },
+        isStrongPassword: {
+            errorMessage:
+                'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+            options: {
+                minLowercase: 1,
+                minUppercase: 1,
+                minNumbers: 1,
+                minSymbols: 1,
+            },
+        },
     },
 });
 

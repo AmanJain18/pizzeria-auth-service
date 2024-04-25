@@ -4,6 +4,7 @@ import { User } from '../../src/entity/User';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/config/data-source';
 import { Roles } from '../../src/constants';
+import { extractTokenFromCookie, isValidJwt } from '../utils';
 
 describe('POST /auth/register', () => {
     // This will hold the database connection
@@ -157,6 +158,37 @@ describe('POST /auth/register', () => {
             // Assert
             expect(response.statusCode).toBe(400);
             expect(users).toHaveLength(1);
+        });
+        it('should return the access and refresh tokens in the cookie', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+            // Act
+            const response = await request(app)
+                .post('/auth/register')
+                .send(userData);
+
+            // Assert
+            interface Headers {
+                'set-cookie'?: string[];
+            }
+
+            // expect(response.headers['set-cookie']).toBeDefined();
+            const cookies: string[] =
+                (response.headers as Headers)['set-cookie'] || [];
+            const accessToken = extractTokenFromCookie(cookies, 'accessToken');
+            const refreshToken = extractTokenFromCookie(
+                cookies,
+                'refreshToken',
+            );
+            expect(accessToken).not.toBeNull();
+            expect(refreshToken).not.toBeNull();
+            expect(isValidJwt(accessToken)).toBeTruthy();
+            expect(isValidJwt(refreshToken)).toBeTruthy();
         });
     });
 

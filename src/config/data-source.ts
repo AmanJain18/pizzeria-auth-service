@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { User } from '../entity/User';
 import { Config } from '.';
+import { RefreshToken } from '../entity/RefreshToken';
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
     // This will only synchronize the database in development and test environments, not in production. Also, it is not recommended to use synchronize in production.
     synchronize: false,
     logging: false,
-    entities: [User],
+    entities: [User, RefreshToken],
     migrations: [],
     subscribers: [],
 });

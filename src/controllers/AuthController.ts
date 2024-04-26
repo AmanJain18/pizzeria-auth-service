@@ -64,28 +64,31 @@ export class AuthController {
             };
 
             const accessToken = sign(payload, privateKey, {
-                algorithm: 'RS256',
-                expiresIn: '1h',
+                algorithm: 'RS256', // RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
+                expiresIn: '1h', // 1 hour
                 issuer: 'auth-service',
             });
+
             const refreshToken = sign(payload, Config.REFRESH_TOKEN_SECRET!, {
-                algorithm: 'HS256',
-                expiresIn: '30d',
+                algorithm: 'HS256', // HMAC using SHA-256 hash algorithm
+                expiresIn: '30d', // 30 days
                 issuer: 'auth-service',
             });
+
             res.cookie('accessToken', accessToken, {
                 httpOnly: true,
                 domain: 'localhost',
                 sameSite: 'strict',
-                maxAge: 1000 * 60 * 60,
+                maxAge: 1000 * 60 * 60, // 1 hour
             });
 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 domain: 'localhost',
                 sameSite: 'strict',
-                maxAge: 1000 * 60 * 60 * 24 * 30,
+                maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
             });
+
             res.status(201).json({ id: user.id });
         } catch (err) {
             next(err);

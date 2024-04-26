@@ -8,8 +8,6 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    // const error = createError(401, 'Unauthorized');
-    // throw error;
     res.send('Welcome to auth service');
 });
 

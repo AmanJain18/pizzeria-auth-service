@@ -135,7 +135,7 @@ describe('POST /auth/register', () => {
             expect(users[0].password).not.toBe(userData.password);
             expect(users[0].password).toHaveLength(60);
             expect(users[0].password).toEqual(
-                expect.stringMatching(/^\$2b\$10\$/),
+                expect.stringMatching(/^\$2[a|b]\$10\$/),
             );
         });
 

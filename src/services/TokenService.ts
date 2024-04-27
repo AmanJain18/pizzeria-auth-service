@@ -3,8 +3,12 @@ import path from 'path';
 import { JwtPayload, sign } from 'jsonwebtoken';
 import createHttpError from 'http-errors';
 import { Config } from '../config';
+import { RefreshToken } from '../entity/RefreshToken';
+import { User } from '../entity/User';
+import { Repository } from 'typeorm';
 
 export class TokenService {
+    constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
     // Create an access token
     generateAccessToken(paylod: JwtPayload) {
         let privateKey: Buffer;
@@ -35,5 +39,14 @@ export class TokenService {
         });
 
         return refreshToken;
+    }
+    // Persist the refresh token
+    async persistRefreshToken(user: User) {
+        const newRefreshToken = await this.refreshTokenRepository.save({
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+            user: user,
+        });
+
+        return newRefreshToken;
     }
 }

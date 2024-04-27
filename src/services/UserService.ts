@@ -37,4 +37,11 @@ export class UserService {
             throw error;
         }
     }
+
+    async userExist(email: string) {
+        // Check if the user exists
+        return await this.userRepository.findOne({
+            where: { email: email },
+        });
+    }
 }

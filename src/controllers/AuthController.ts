@@ -1,15 +1,18 @@
+import { CredentialService } from './../services/CredentialService';
 import { NextFunction, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { RegisterUserRequest } from '../types';
+import { LoginUserRequest, RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
 import { JwtPayload } from 'jsonwebtoken';
 import { Logger } from 'winston';
 import { TokenService } from '../services/TokenService';
+import createHttpError from 'http-errors';
 
 export class AuthController {
     constructor(
         private userService: UserService,
         private tokenService: TokenService,
+        private credentialService: CredentialService,
         private logger: Logger,
     ) {}
 
@@ -75,6 +78,85 @@ export class AuthController {
             });
 
             res.status(201).json({ id: user.id });
+        } catch (err) {
+            next(err);
+            return;
+        }
+    }
+
+    async login(req: LoginUserRequest, res: Response, next: NextFunction) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            res.status(400).json({
+                errors: result.array(),
+            });
+            return;
+        }
+        const { email, password } = req.body;
+        // Log the request
+        this.logger.debug('New request to login a user', {
+            email,
+            password: '******',
+        });
+
+        // Try to log in the user
+        // Check if the user exists
+        // Compare the password
+        // Generate tokens
+        // Set the cookies
+        // Return the response
+
+        try {
+            const user = await this.userService.userExist(email);
+            if (!user) {
+                const error = createHttpError(400, 'Invalid Email or password');
+                next(error);
+                return;
+            }
+
+            const passwordMatch = await this.credentialService.comparePassword(
+                password,
+                user.password,
+            );
+
+            if (!passwordMatch) {
+                const error = createHttpError(400, 'Invalid Email or password');
+                next(error);
+                return;
+            }
+
+            const payload: JwtPayload = {
+                sub: String(user.id),
+                role: user.role,
+            };
+
+            const accessToken = this.tokenService.generateAccessToken(payload);
+
+            // Persist the refresh token
+            const newRefreshToken =
+                await this.tokenService.persistRefreshToken(user);
+
+            const refreshToken = this.tokenService.generateRefreshToken({
+                ...payload,
+                id: String(newRefreshToken.id),
+            });
+
+            res.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                domain: 'localhost',
+                sameSite: 'strict',
+                maxAge: 1000 * 60 * 60, // 1 hour
+            });
+
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                domain: 'localhost',
+                sameSite: 'strict',
+                maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+            });
+
+            this.logger.info('User has been logged in', { id: user.id });
+            res.status(200).json({ id: user.id });
         } catch (err) {
             next(err);
             return;

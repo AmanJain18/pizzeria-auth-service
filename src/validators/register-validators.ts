@@ -13,20 +13,27 @@ export default checkSchema({
     },
     email: {
         errorMessage: 'Email is required',
-        notEmpty: true,
         trim: true,
         toLowerCase: true,
+        notEmpty: {
+            errorMessage: 'Email is required',
+            bail: true,
+        },
         isEmail: {
             errorMessage: 'Invalid email',
         },
     },
     password: {
         errorMessage: 'Password is required',
-        notEmpty: true,
         trim: true,
+        notEmpty: {
+            errorMessage: 'Password is required',
+            bail: true,
+        },
         isLength: {
             errorMessage: 'Password must be at least 8 characters long',
             options: { min: 8 },
+            bail: true,
         },
         isStrongPassword: {
             errorMessage:

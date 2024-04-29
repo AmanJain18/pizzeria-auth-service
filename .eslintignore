@@ -1,2 +1,11 @@
-node_modules
-dist
+# Ignore all files in the node_modules directory
+node_modules/
+
+# Ignore specific files
+build/
+dist/
+coverage/
+
+# Ignore files with specific extensions
+*.json
+*.md

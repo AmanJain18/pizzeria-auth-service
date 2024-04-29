@@ -70,4 +70,57 @@ describe('POST /auth/login', () => {
             );
         });
     });
+
+    describe('Login with Missing Fields', () => {
+        it('should return status code 400 if email is missing', async () => {
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+
+            await request(app).post('/auth/register').send(userData);
+            // Arrange
+            const loginData = {
+                email: '',
+                password: 'Test@1234',
+            };
+            // Act
+            const response: {
+                statusCode: number;
+                body: { errors: { msg: string }[] };
+            } = await request(app).post('/auth/login').send(loginData);
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors.length).toBeGreaterThan(0);
+            expect(response.body.errors[0].msg).toBe('Email is required');
+        });
+        it('should return status code 400 if password is missing', async () => {
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+
+            await request(app).post('/auth/register').send(userData);
+            // Arrange
+            const loginData = {
+                email: 'test@gmail.com',
+                password: '',
+            };
+            // Act
+            const response: {
+                statusCode: number;
+                body: { errors: { msg: string }[] };
+            } = await request(app).post('/auth/login').send(loginData);
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors.length).toBeGreaterThan(0);
+            expect(response.body.errors[0].msg).toBe('Password is required');
+        });
+    });
 });

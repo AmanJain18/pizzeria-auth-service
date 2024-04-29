@@ -206,4 +206,58 @@ describe('POST /auth/login', () => {
             );
         });
     });
+
+    describe('Email Field Handling', () => {
+        it('should allow login regardless of email case', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+
+            await request(app).post('/auth/register').send(userData);
+
+            const loginData = {
+                email: 'Test@Gmail.com', // Different case
+                password: 'Test@1234',
+            };
+            // Act
+            const response = await request(app)
+                .post('/auth/login')
+                .send(loginData);
+            // Assert
+            expect(response.statusCode).toBe(200);
+            expect(response.headers['content-type']).toEqual(
+                expect.stringContaining('json'),
+            );
+        });
+
+        it('should trim the email field', async () => {
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+
+            await request(app).post('/auth/register').send(userData);
+            // Arrange
+            const loginData = {
+                email: ' test@gmail.com ',
+                password: 'Test@1234',
+            };
+            // Act
+            const response = await request(app)
+                .post('/auth/login')
+                .send(loginData);
+
+            // Assert
+            expect(response.statusCode).toBe(200);
+            expect(response.headers['content-type']).toEqual(
+                expect.stringContaining('json'),
+            );
+        });
+    });
 });

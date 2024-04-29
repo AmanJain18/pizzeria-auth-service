@@ -2,8 +2,9 @@ import request from 'supertest';
 import app from '../../src/app';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/config/data-source';
-// import bcrypt from 'bcryptjs';
-// import { User } from '../../src/entity/User';
+import { User } from '../../src/entity/User';
+import { Roles } from '../../src/constants';
+import bcrypt from 'bcryptjs';
 // import { extractTokenFromCookie, isValidJwt } from '../utils';
 
 describe('POST /auth/login', () => {
@@ -24,28 +25,33 @@ describe('POST /auth/login', () => {
 
     describe('Successful Login', () => {
         it('should return status code 200', async () => {
+            // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
                 email: 'test@gmail.com',
                 password: 'Test@1234',
             };
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
 
-            await request(app).post('/auth/register').send(userData);
-            // Arrange
-            const loginData = {
-                email: 'test@gmail.com',
-                password: 'Test@1234',
-            };
             // Act
-            const response = await request(app)
-                .post('/auth/login')
-                .send(loginData);
+            const response = await request(app).post('/auth/login').send({
+                email: userData.email,
+                password: userData.password,
+            });
+
             // Assert
             expect(response.statusCode).toBe(200);
         });
 
         it('should return valid json response', async () => {
+            // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -53,16 +59,20 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
-            // Arrange
-            const loginData = {
-                email: 'test@gmail.com',
-                password: 'Test@1234',
-            };
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
+
             // Act
-            const response = await request(app)
-                .post('/auth/login')
-                .send(loginData);
+            const response = await request(app).post('/auth/login').send({
+                email: userData.email,
+                password: userData.password,
+            });
+
             // Assert
             // Application/json utf-8
             expect(response.headers['content-type']).toEqual(
@@ -73,6 +83,7 @@ describe('POST /auth/login', () => {
 
     describe('Login with Missing Fields', () => {
         it('should return status code 400 if email is missing', async () => {
+            // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -80,24 +91,31 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
-            // Arrange
-            const loginData = {
-                email: '',
-                password: 'Test@1234',
-            };
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
+
             // Act
             const response: {
                 statusCode: number;
                 body: { errors: { msg: string }[] };
-            } = await request(app).post('/auth/login').send(loginData);
+            } = await request(app).post('/auth/login').send({
+                password: userData.password,
+            });
+
             // Assert
             expect(response.statusCode).toBe(400);
             expect(response.body).toHaveProperty('errors');
             expect(response.body.errors.length).toBeGreaterThan(0);
             expect(response.body.errors[0].msg).toBe('Email is required');
         });
+
         it('should return status code 400 if password is missing', async () => {
+            // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -105,17 +123,22 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
-            // Arrange
-            const loginData = {
-                email: 'test@gmail.com',
-                password: '',
-            };
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
+
             // Act
             const response: {
                 statusCode: number;
                 body: { errors: { msg: string }[] };
-            } = await request(app).post('/auth/login').send(loginData);
+            } = await request(app).post('/auth/login').send({
+                email: userData.email,
+            });
+
             // Assert
             expect(response.statusCode).toBe(400);
             expect(response.body).toHaveProperty('errors');
@@ -126,6 +149,7 @@ describe('POST /auth/login', () => {
 
     describe('Invalid Credentials', () => {
         it('should return status code 400 if email format is invalid', async () => {
+            // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -133,17 +157,24 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
-            // Arrange
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
             const loginData = {
                 email: 'testgmail.com', // Invalid email format
                 password: 'Test@1234',
             };
+
             // Act
             const response: {
                 statusCode: number;
                 body: { errors: { msg: string }[] };
             } = await request(app).post('/auth/login').send(loginData);
+
             // Assert
             expect(response.statusCode).toBe(400);
             expect(response.body).toHaveProperty('errors');
@@ -159,17 +190,25 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
 
             const loginData = {
                 email: 'Test1@Gmail.com', // Different email
                 password: 'Test@1234',
             };
+
             // Act
             const response: {
                 statusCode: number;
                 body: { errors: { msg: string }[] };
             } = await request(app).post('/auth/login').send(loginData);
+
             // Assert
             expect(response.statusCode).toBe(400);
             expect(response.body).toHaveProperty('errors');
@@ -179,6 +218,7 @@ describe('POST /auth/login', () => {
         });
 
         it('should throw status code 400 and error message for invalid password', async () => {
+            // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -186,12 +226,19 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
-            // Arrange
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
+
             const loginData = {
                 email: ' test@gmail.com ',
                 password: 'Test@123456',
             };
+
             // Act
             const response: {
                 statusCode: number;
@@ -217,16 +264,20 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
 
-            const loginData = {
-                email: 'Test@Gmail.com', // Different case
-                password: 'Test@1234',
-            };
             // Act
-            const response = await request(app)
-                .post('/auth/login')
-                .send(loginData);
+            const response = await request(app).post('/auth/login').send({
+                email: userData.email,
+                password: userData.password,
+            });
+
             // Assert
             expect(response.statusCode).toBe(200);
             expect(response.headers['content-type']).toEqual(
@@ -235,6 +286,7 @@ describe('POST /auth/login', () => {
         });
 
         it('should trim the email field', async () => {
+            // Arrange
             const userData = {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -242,16 +294,19 @@ describe('POST /auth/login', () => {
                 password: 'Test@1234',
             };
 
-            await request(app).post('/auth/register').send(userData);
-            // Arrange
-            const loginData = {
-                email: ' test@gmail.com ',
-                password: 'Test@1234',
-            };
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const userRepository = AppDataSource.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
+
             // Act
-            const response = await request(app)
-                .post('/auth/login')
-                .send(loginData);
+            const response = await request(app).post('/auth/login').send({
+                email: userData.email,
+                password: userData.password,
+            });
 
             // Assert
             expect(response.statusCode).toBe(200);

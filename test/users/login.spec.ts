@@ -123,4 +123,87 @@ describe('POST /auth/login', () => {
             expect(response.body.errors[0].msg).toBe('Password is required');
         });
     });
+
+    describe('Invalid Credentials', () => {
+        it('should return status code 400 if email format is invalid', async () => {
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+
+            await request(app).post('/auth/register').send(userData);
+            // Arrange
+            const loginData = {
+                email: 'testgmail.com', // Invalid email format
+                password: 'Test@1234',
+            };
+            // Act
+            const response: {
+                statusCode: number;
+                body: { errors: { msg: string }[] };
+            } = await request(app).post('/auth/login').send(loginData);
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors[0].msg).toBe('Invalid email');
+        });
+
+        it('should throw status code 400 and error message for invalid email', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+
+            await request(app).post('/auth/register').send(userData);
+
+            const loginData = {
+                email: 'Test1@Gmail.com', // Different email
+                password: 'Test@1234',
+            };
+            // Act
+            const response: {
+                statusCode: number;
+                body: { errors: { msg: string }[] };
+            } = await request(app).post('/auth/login').send(loginData);
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors[0].msg).toBe(
+                'Invalid Email or password',
+            );
+        });
+
+        it('should throw status code 400 and error message for invalid password', async () => {
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+
+            await request(app).post('/auth/register').send(userData);
+            // Arrange
+            const loginData = {
+                email: ' test@gmail.com ',
+                password: 'Test@123456',
+            };
+            // Act
+            const response: {
+                statusCode: number;
+                body: { errors: { msg: string }[] };
+            } = await request(app).post('/auth/login').send(loginData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors[0].msg).toBe(
+                'Invalid Email or password',
+            );
+        });
+    });
 });

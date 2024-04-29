@@ -5,7 +5,7 @@ import { AppDataSource } from '../../src/config/data-source';
 import { User } from '../../src/entity/User';
 import { Roles } from '../../src/constants';
 import bcrypt from 'bcryptjs';
-// import { extractTokenFromCookie, isValidJwt } from '../utils';
+import { extractTokenFromCookie, isValidJwt } from '../utils';
 
 describe('POST /auth/login', () => {
     let connection: DataSource;
@@ -78,6 +78,46 @@ describe('POST /auth/login', () => {
             expect(response.headers['content-type']).toEqual(
                 expect.stringContaining('json'),
             );
+        });
+
+        it('should return the access token and refresh token inside a cookie', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: 'rakesh@mern.space',
+                password: 'password',
+            };
+
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+            const userRepository = connection.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                password: hashedPassword,
+                role: Roles.CUSTOMER,
+            });
+
+            // Act
+            const response = await request(app)
+                .post('/auth/login')
+                .send({ email: userData.email, password: userData.password });
+
+            interface Headers {
+                'set-cookie'?: string[];
+            }
+
+            const cookies: string[] =
+                (response.headers as Headers)['set-cookie'] || [];
+            const accessToken = extractTokenFromCookie(cookies, 'accessToken');
+            const refreshToken = extractTokenFromCookie(
+                cookies,
+                'refreshToken',
+            );
+            expect(accessToken).not.toBeNull();
+            expect(refreshToken).not.toBeNull();
+            expect(isValidJwt(accessToken)).toBeTruthy();
+            expect(isValidJwt(refreshToken)).toBeTruthy();
         });
     });
 

@@ -1,7 +1,7 @@
 import { CredentialService } from './../services/CredentialService';
 import { NextFunction, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { LoginUserRequest, RegisterUserRequest } from '../types';
+import { AuthRequest, LoginUserRequest, RegisterUserRequest } from '../types';
 import { UserService } from '../services/UserService';
 import { JwtPayload } from 'jsonwebtoken';
 import { Logger } from 'winston';
@@ -161,5 +161,11 @@ export class AuthController {
             next(err);
             return;
         }
+    }
+
+    async self(req: AuthRequest, res: Response) {
+        // If the user is logged in, return the user's information by checking the token
+        const user = await this.userService.findById(Number(req.auth.sub));
+        res.status(200).json(user);
     }
 }

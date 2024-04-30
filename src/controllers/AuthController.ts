@@ -166,6 +166,6 @@ export class AuthController {
     async self(req: AuthRequest, res: Response) {
         // If the user is logged in, return the user's information by checking the token
         const user = await this.userService.findById(Number(req.auth.sub));
-        res.status(200).json(user);
+        res.status(200).json({ ...user, password: undefined });
     }
 }

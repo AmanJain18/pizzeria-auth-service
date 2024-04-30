@@ -32,7 +32,7 @@ describe('GET /auth/self', () => {
         jwks.stop();
     });
 
-    describe('Check if user is logged in', () => {
+    describe('Check if user is already logged in', () => {
         it('should return status code 200', async () => {
             // Arrange
             const accessToken = jwks.token({
@@ -109,6 +109,28 @@ describe('GET /auth/self', () => {
             expect(response.body as Record<string, string>).not.toHaveProperty(
                 'password',
             );
+        });
+
+        it('should return status code 401 if token does not exists', async () => {
+            // Arrange
+            // Register user
+            const userData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@gmail.com',
+                password: 'Test@1234',
+            };
+            //Act
+            const userRepository = connection.getRepository(User);
+            await userRepository.save({
+                ...userData,
+                role: Roles.CUSTOMER,
+            });
+
+            // Send request without token
+            const response = await request(app).get('/auth/self').send();
+            // Assert
+            expect(response.statusCode).toBe(401);
         });
     });
 });

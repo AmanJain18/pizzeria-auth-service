@@ -6,15 +6,15 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column('varchar', { length: 30 })
     firstName: string;
 
-    @Column()
+    @Column('varchar', { length: 30 })
     lastName: string;
 
     @Column({ unique: true })
@@ -23,7 +23,7 @@ export class User {
     @Column()
     password: string;
 
-    @Column()
+    @Column('varchar', { length: 20 })
     role: string;
 
     @UpdateDateColumn({ select: false })

@@ -1,5 +1,10 @@
 import { AuthRequest } from './../types/index';
-import express, { NextFunction, Request, Response } from 'express';
+import express, {
+    NextFunction,
+    Request,
+    RequestHandler,
+    Response,
+} from 'express';
 import { AuthController } from '../controllers/AuthController';
 import { UserService } from '../services/UserService';
 import { TokenService } from '../services/TokenService';
@@ -12,6 +17,7 @@ import loginValidators from '../validators/login-validators';
 import { CredentialService } from '../services/CredentialService';
 import authenticate from '../middlewares/authenticateUser';
 import validateRefreshToken from '../middlewares/validateRefreshToken';
+import parseRefreshToken from '../middlewares/parseRefreshToken';
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -50,6 +56,18 @@ router.post(
     validateRefreshToken,
     (req: Request, res: Response, next: NextFunction) =>
         authController.refresh(req as AuthRequest, res, next),
+);
+
+router.post(
+    '/logout',
+    authenticate as RequestHandler,
+    parseRefreshToken as RequestHandler,
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.logout(
+            req as AuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
 );
 
 export default router;

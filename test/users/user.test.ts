@@ -13,7 +13,7 @@ describe('GET /auth/self', () => {
     let jwks: ReturnType<typeof createJWKSMock>;
 
     beforeAll(async () => {
-        jwks = createJWKSMock('http://localhost:3002');
+        jwks = createJWKSMock('http://localhost:3000');
         connection = await AppDataSource.initialize();
     });
 

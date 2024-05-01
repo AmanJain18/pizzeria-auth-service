@@ -31,3 +31,7 @@ export type AuthCookie = {
     accessToken: string;
     refreshToken: string;
 };
+
+export interface RevokedRefreshTokenPayload {
+    id: string;
+}

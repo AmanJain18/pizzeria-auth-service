@@ -4,7 +4,9 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
+    ManyToOne,
 } from 'typeorm';
+import { Tenant } from './Tenant';
 
 @Entity({ name: 'users' })
 export class User {
@@ -25,6 +27,9 @@ export class User {
 
     @Column('varchar', { length: 20 })
     role: string;
+
+    @ManyToOne(() => Tenant)
+    tenant: Tenant;
 
     @UpdateDateColumn({ select: false })
     updatedAt: Date;

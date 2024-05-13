@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction, Request } from 'express';
 import { Logger } from 'winston';
 import { TenantService } from '../services/TenantService';
 import { CreateTenantRequest } from '../types';
@@ -46,6 +46,17 @@ export class TenantController {
             this.logger.info('Tenant has been updated', { id: tenantId });
 
             res.json({ id: Number(tenantId) });
+        } catch (err) {
+            next(err);
+            return;
+        }
+    }
+
+    async getTenantList(req: Request, res: Response, next: NextFunction) {
+        try {
+            const tenants = await this.tenantService.getTenants();
+            this.logger.info('All tenants have been fetched');
+            res.json(tenants);
         } catch (err) {
             next(err);
             return;

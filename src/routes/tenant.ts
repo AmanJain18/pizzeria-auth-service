@@ -31,4 +31,8 @@ router.patch(
         tenantController.update(req, res, next),
 );
 
+router.get('/', (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getTenantList(req, res, next),
+);
+
 export default router;

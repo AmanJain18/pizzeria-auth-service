@@ -6,15 +6,16 @@ import createHttpError from 'http-errors';
 export class TenantService {
     constructor(private tenantRepository: Repository<Tenant>) {}
 
-    async createTenant({ name, address }: ITenant) {
+    async createTenant(tenantData: ITenant) {
         try {
-            return await this.tenantRepository.save({
-                name,
-                address,
-            });
+            return await this.tenantRepository.save(tenantData);
         } catch (err) {
             const error = createHttpError(500, 'Error saving tenant data');
             throw error;
         }
+    }
+
+    async updateTenant(id: number, tenantData: ITenant) {
+        return await this.tenantRepository.update(id, tenantData);
     }
 }

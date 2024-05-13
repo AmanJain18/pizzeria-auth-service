@@ -30,7 +30,7 @@ describe('POST /tenants', () => {
         jwks.stop();
     });
 
-    describe('Tenant Created', () => {
+    describe('Tenant created', () => {
         it('should return status code 201', async () => {
             // Arrange
             const adminToken = jwks.token({

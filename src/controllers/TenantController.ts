@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { Logger } from 'winston';
 import { TenantService } from '../services/TenantService';
 import { CreateTenantRequest } from '../types';
+import createHttpError from 'http-errors';
 
 export class TenantController {
     constructor(
@@ -11,10 +12,7 @@ export class TenantController {
     async create(req: CreateTenantRequest, res: Response, next: NextFunction) {
         const { name, address } = req.body;
         // Log the request
-        this.logger.debug('New request to create a tenant', {
-            name,
-            address,
-        });
+        this.logger.debug('New request to create a tenant', req.body);
         try {
             const tenant = await this.tenantService.createTenant({
                 name,
@@ -23,6 +21,31 @@ export class TenantController {
             this.logger.info('New tenant has been created', { id: tenant.id });
 
             res.status(201).json({ tenantId: tenant.id });
+        } catch (err) {
+            next(err);
+            return;
+        }
+    }
+
+    async update(req: CreateTenantRequest, res: Response, next: NextFunction) {
+        const { name, address } = req.body;
+        const tenantId = req.params.id;
+
+        if (isNaN(Number(tenantId))) {
+            next(createHttpError(400, 'Invalid url parameter'));
+        }
+        // Log the request
+        this.logger.debug('Request to update a tenant', req.body);
+
+        try {
+            await this.tenantService.updateTenant(Number(tenantId), {
+                name,
+                address,
+            });
+
+            this.logger.info('Tenant has been updated', { id: tenantId });
+
+            res.json({ id: Number(tenantId) });
         } catch (err) {
             next(err);
             return;

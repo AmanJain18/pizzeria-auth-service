@@ -22,4 +22,13 @@ router.post(
         tenantController.create(req, res, next),
 );
 
+// Update a tenant
+router.patch(
+    '/:id',
+    authenticateUser,
+    isAuthorized([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        tenantController.update(req, res, next),
+);
+
 export default router;

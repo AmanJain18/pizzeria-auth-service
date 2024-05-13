@@ -3,12 +3,18 @@ import bcrypt from 'bcryptjs';
 import { User } from '../entity/User';
 import { UserData } from '../types';
 import createHttpError from 'http-errors';
-import { Roles } from '../constants';
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
 
-    async registerUser({ firstName, lastName, email, password }: UserData) {
+    async registerUser({
+        firstName,
+        lastName,
+        email,
+        password,
+        role,
+        tenantId,
+    }: UserData) {
         // Check if the user already exists
         const userExist = await this.userRepository.findOne({
             where: { email: email },
@@ -29,7 +35,8 @@ export class UserService {
                 lastName,
                 email,
                 password: hashPassword,
-                role: Roles.CUSTOMER,
+                role,
+                tenantId: tenantId ? { id: tenantId } : undefined,
             });
         } catch (err) {
             // If an error occurs while saving, throw an error

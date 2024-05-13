@@ -7,6 +7,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import { Logger } from 'winston';
 import { TokenService } from '../services/TokenService';
 import createHttpError from 'http-errors';
+import { Roles } from '../constants';
 
 export class AuthController {
     constructor(
@@ -44,6 +45,7 @@ export class AuthController {
                 lastName,
                 email,
                 password,
+                role: Roles.CUSTOMER,
             });
             this.logger.info('User has been registered', { id: user.id });
 

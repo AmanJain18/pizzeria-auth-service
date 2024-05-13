@@ -31,8 +31,14 @@ router.patch(
         tenantController.update(req, res, next),
 );
 
+// Get all tenants
 router.get('/', (req: Request, res: Response, next: NextFunction) =>
-    tenantController.getTenantList(req, res, next),
+    tenantController.getAll(req, res, next),
+);
+
+// Get a tenant by id
+router.get('/:id', (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getOne(req, res, next),
 );
 
 export default router;

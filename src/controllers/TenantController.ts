@@ -33,6 +33,7 @@ export class TenantController {
 
         if (isNaN(Number(tenantId))) {
             next(createHttpError(400, 'Invalid url parameter'));
+            return;
         }
         // Log the request
         this.logger.debug('Request to update a tenant', req.body);
@@ -52,11 +53,37 @@ export class TenantController {
         }
     }
 
-    async getTenantList(req: Request, res: Response, next: NextFunction) {
+    async getAll(req: Request, res: Response, next: NextFunction) {
         try {
             const tenants = await this.tenantService.getTenants();
             this.logger.info('All tenants have been fetched');
             res.json(tenants);
+        } catch (err) {
+            next(err);
+            return;
+        }
+    }
+
+    async getOne(req: Request, res: Response, next: NextFunction) {
+        const tenantId = req.params.id;
+
+        if (isNaN(Number(tenantId))) {
+            next(createHttpError(400, 'Invalid url parameter'));
+            return;
+        }
+
+        try {
+            const tenant = await this.tenantService.getTenantById(
+                Number(tenantId),
+            );
+
+            if (!tenant) {
+                next(createHttpError(400, 'Tenant not found'));
+                return;
+            }
+
+            this.logger.info('Tenant have been fetched');
+            res.json(tenant);
         } catch (err) {
             next(err);
             return;

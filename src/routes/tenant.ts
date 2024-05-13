@@ -41,4 +41,13 @@ router.get('/:id', (req: Request, res: Response, next: NextFunction) =>
     tenantController.getOne(req, res, next),
 );
 
+// Delete a tenant
+router.delete(
+    '/:id',
+    authenticateUser,
+    isAuthorized([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        tenantController.delete(req, res, next),
+);
+
 export default router;

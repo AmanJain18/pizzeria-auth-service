@@ -37,8 +37,12 @@ router.get('/', (req: Request, res: Response, next: NextFunction) =>
 );
 
 // Get a tenant by id
-router.get('/:id', (req: Request, res: Response, next: NextFunction) =>
-    tenantController.getOne(req, res, next),
+router.get(
+    '/:id',
+    authenticateUser,
+    isAuthorized([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        tenantController.getOne(req, res, next),
 );
 
 // Delete a tenant

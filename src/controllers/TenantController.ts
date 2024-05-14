@@ -3,6 +3,7 @@ import { Logger } from 'winston';
 import { TenantService } from '../services/TenantService';
 import { CreateTenantRequest } from '../types';
 import createHttpError from 'http-errors';
+import { validationResult } from 'express-validator';
 
 export class TenantController {
     constructor(
@@ -10,6 +11,16 @@ export class TenantController {
         private logger: Logger,
     ) {}
     async create(req: CreateTenantRequest, res: Response, next: NextFunction) {
+        // Validate the request
+        const result = validationResult(req);
+        // If there are errors, return them
+        if (!result.isEmpty()) {
+            res.status(400).json({
+                errors: result.array(),
+            });
+            return;
+        }
+
         const { name, address } = req.body;
         // Log the request
         this.logger.debug('New request to create a tenant', req.body);
@@ -28,6 +39,16 @@ export class TenantController {
     }
 
     async update(req: CreateTenantRequest, res: Response, next: NextFunction) {
+        // Validate the request
+        const result = validationResult(req);
+        // If there are errors, return them
+        if (!result.isEmpty()) {
+            res.status(400).json({
+                errors: result.array(),
+            });
+            return;
+        }
+
         const { name, address } = req.body;
         const tenantId = req.params.id;
 

@@ -3,6 +3,7 @@ import { TenantService } from '../services/TenantService';
 import { TenantController } from '../controllers/TenantController';
 import { AppDataSource } from '../config/data-source';
 import { Tenant } from '../entity/Tenant';
+import tenantValidator from '../validators/tenant-validators';
 import logger from '../config/logger';
 import authenticateUser from '../middlewares/authenticateUser';
 import { isAuthorized } from '../middlewares/isAuthorized';
@@ -18,6 +19,7 @@ router.post(
     '/',
     authenticateUser,
     isAuthorized([Roles.ADMIN]),
+    tenantValidator,
     (req: Request, res: Response, next: NextFunction) =>
         tenantController.create(req, res, next),
 );
@@ -27,6 +29,7 @@ router.patch(
     '/:id',
     authenticateUser,
     isAuthorized([Roles.ADMIN]),
+    tenantValidator,
     (req: Request, res: Response, next: NextFunction) =>
         tenantController.update(req, res, next),
 );

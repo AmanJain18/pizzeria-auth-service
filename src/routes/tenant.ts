@@ -3,7 +3,7 @@ import { TenantService } from '../services/TenantService';
 import { TenantController } from '../controllers/TenantController';
 import { AppDataSource } from '../config/data-source';
 import { Tenant } from '../entity/Tenant';
-import tenantValidator from '../validators/tenant-validators';
+import tenantValidator from '../validators/tenant-validator';
 import logger from '../config/logger';
 import authenticateUser from '../middlewares/authenticateUser';
 import { isAuthorized } from '../middlewares/isAuthorized';

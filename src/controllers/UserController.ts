@@ -1,8 +1,9 @@
 import { Response, NextFunction, Request } from 'express';
 import { Logger } from 'winston';
 import { UserService } from '../services/UserService';
-import { CreateUserRequest } from '../types';
+import { CreateUserRequest, UpdateUserRequest } from '../types';
 import createHttpError from 'http-errors';
+import { validationResult } from 'express-validator';
 
 export class UserController {
     constructor(
@@ -10,6 +11,15 @@ export class UserController {
         private logger: Logger,
     ) {}
     async create(req: CreateUserRequest, res: Response, next: NextFunction) {
+        // Validate the request
+        const result = validationResult(req);
+        // If there are errors, return them
+        if (!result.isEmpty()) {
+            res.status(400).json({
+                errors: result.array(),
+            });
+            return;
+        }
         const { firstName, lastName, email, password, tenantId, role } =
             req.body;
         // Log the request
@@ -32,9 +42,18 @@ export class UserController {
         }
     }
 
-    async update(req: CreateUserRequest, res: Response, next: NextFunction) {
-        const userId = req.params.id;
+    async update(req: UpdateUserRequest, res: Response, next: NextFunction) {
+        // Validate the request
+        const result = validationResult(req);
+        // If there are errors, return them
+        if (!result.isEmpty()) {
+            res.status(400).json({
+                errors: result.array(),
+            });
+            return;
+        }
         const { email, firstName, lastName, role, tenantId } = req.body;
+        const userId = req.params.id;
         if (isNaN(Number(userId))) {
             next(createHttpError(400, 'Invalid url parameter'));
             return;

@@ -2,11 +2,14 @@ import express, { NextFunction, Request, Response } from 'express';
 import { UserService } from '../services/UserService';
 import { UserController } from '../controllers/UserController';
 import { AppDataSource } from '../config/data-source';
-import logger from '../config/logger';
-import authenticateUser from '../middlewares/authenticateUser';
 import { isAuthorized } from '../middlewares/isAuthorized';
 import { Roles } from '../constants';
 import { User } from '../entity/User';
+import { CreateUserRequest, UpdateUserRequest } from '../types';
+import createUserValidator from '../validators/create-user-validator';
+import updateUserValidator from '../validators/update-user-validator';
+import authenticateUser from '../middlewares/authenticateUser';
+import logger from '../config/logger';
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -18,7 +21,8 @@ router.post(
     '/',
     authenticateUser,
     isAuthorized([Roles.ADMIN]),
-    (req: Request, res: Response, next: NextFunction) =>
+    createUserValidator,
+    (req: CreateUserRequest, res: Response, next: NextFunction) =>
         userController.create(req, res, next),
 );
 
@@ -27,7 +31,8 @@ router.patch(
     '/:id',
     authenticateUser,
     isAuthorized([Roles.ADMIN]),
-    (req: Request, res: Response, next: NextFunction) =>
+    updateUserValidator,
+    (req: UpdateUserRequest, res: Response, next: NextFunction) =>
         userController.update(req, res, next),
 );
 

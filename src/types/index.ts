@@ -58,3 +58,7 @@ export interface IUpdateUserByAdmin {
     tenantId?: string;
     role: string;
 }
+
+export interface UpdateUserRequest extends Request {
+    body: IUpdateUserByAdmin;
+}

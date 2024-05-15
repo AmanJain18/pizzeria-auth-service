@@ -40,4 +40,13 @@ router.get(
         userController.getAll(req, res, next),
 );
 
+// Get a user by id
+router.get(
+    '/:id',
+    authenticateUser,
+    isAuthorized([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.getOne(req, res, next),
+);
+
 export default router;

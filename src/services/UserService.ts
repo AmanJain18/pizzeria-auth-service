@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import { User } from '../entity/User';
-import { UserData } from '../types';
+import { IUpdateUserByAdmin, UserData } from '../types';
 import createHttpError from 'http-errors';
 
 export class UserService {
@@ -57,5 +57,29 @@ export class UserService {
         return await this.userRepository.findOne({
             where: { id: id },
         });
+    }
+
+    async updateEmployeeUser(
+        userId: number,
+        updateUserData: IUpdateUserByAdmin,
+    ) {
+        // Check if the user exists
+        const userExist = await this.userRepository.findOne({
+            where: { id: userId },
+        });
+        // If the user does not exist, throw an error
+        if (!userExist) {
+            const error = createHttpError(404, 'User not found');
+            throw error;
+        }
+
+        // Update user data
+        try {
+            await this.userRepository.update(userId, updateUserData);
+        } catch (err) {
+            // If an error occurs while updating, throw an error
+            const error = createHttpError(500, 'Error updating user data');
+            throw error;
+        }
     }
 }

@@ -22,4 +22,13 @@ router.post(
         userController.create(req, res, next),
 );
 
+// Update a user by admin - Manager and other support roles (Employees)
+router.patch(
+    '/:id',
+    authenticateUser,
+    isAuthorized([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.update(req, res, next),
+);
+
 export default router;

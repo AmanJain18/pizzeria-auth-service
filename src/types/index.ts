@@ -50,3 +50,11 @@ export interface CreateTenantRequest extends Request {
 export interface CreateUserRequest extends Request {
     body: UserData;
 }
+
+export interface IUpdateUserByAdmin {
+    firstName: string;
+    lastName: string;
+    email: string;
+    tenantId?: string;
+    role: string;
+}

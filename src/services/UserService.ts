@@ -7,6 +7,7 @@ import createHttpError from 'http-errors';
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
 
+    // Register a new user
     async registerUser({
         firstName,
         lastName,
@@ -45,8 +46,8 @@ export class UserService {
         }
     }
 
+    // Check if the user exists
     async userExist(email: string) {
-        // Check if the user exists
         return await this.userRepository.findOne({
             where: { email: email },
             select: [
@@ -60,13 +61,14 @@ export class UserService {
         });
     }
 
+    // Find a user by id
     async findById(id: number) {
-        // Find a user by id
         return await this.userRepository.findOne({
             where: { id: id },
         });
     }
 
+    // Update user data by admin
     async updateEmployeeUser(
         userId: number,
         updateUserData: IUpdateUserByAdmin,
@@ -91,8 +93,13 @@ export class UserService {
         }
     }
 
+    // Get all users
     async getUsers() {
-        // Get all users
         return await this.userRepository.find();
+    }
+
+    // Delete a user by Id
+    async deleteUser(userId: number) {
+        return await this.userRepository.delete(userId);
     }
 }

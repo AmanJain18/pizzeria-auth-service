@@ -49,4 +49,13 @@ router.get(
         userController.getOne(req, res, next),
 );
 
+// Delete a user
+router.delete(
+    '/:id',
+    authenticateUser,
+    isAuthorized([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.delete(req, res, next),
+);
+
 export default router;

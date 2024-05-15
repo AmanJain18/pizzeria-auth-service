@@ -49,6 +49,14 @@ export class UserService {
         // Check if the user exists
         return await this.userRepository.findOne({
             where: { email: email },
+            select: [
+                'id',
+                'firstName',
+                'lastName',
+                'email',
+                'password',
+                'role',
+            ],
         });
     }
 
@@ -81,5 +89,10 @@ export class UserService {
             const error = createHttpError(500, 'Error updating user data');
             throw error;
         }
+    }
+
+    async getUsers() {
+        // Get all users
+        return await this.userRepository.find();
     }
 }

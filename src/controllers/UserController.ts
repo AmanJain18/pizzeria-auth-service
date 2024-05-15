@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction, Request } from 'express';
 import { Logger } from 'winston';
 import { UserService } from '../services/UserService';
 import { CreateUserRequest } from '../types';
@@ -52,6 +52,17 @@ export class UserController {
             this.logger.info('User has been updated', { id: userId });
 
             res.json({ id: Number(userId) });
+        } catch (err) {
+            next(err);
+            return;
+        }
+    }
+
+    async getAll(req: Request, res: Response, next: NextFunction) {
+        try {
+            const users = await this.userService.getUsers();
+            this.logger.info('All users have been fetched');
+            res.json(users);
         } catch (err) {
             next(err);
             return;

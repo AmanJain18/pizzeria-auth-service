@@ -31,4 +31,13 @@ router.patch(
         userController.update(req, res, next),
 );
 
+// Get all users
+router.get(
+    '/',
+    authenticateUser,
+    isAuthorized([Roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.getAll(req, res, next),
+);
+
 export default router;

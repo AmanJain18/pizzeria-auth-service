@@ -5,7 +5,9 @@ node_modules/
 build/
 dist/
 coverage/
+tests/
 
 # Ignore files with specific extensions
 *.json
 *.md
+*.spec.ts

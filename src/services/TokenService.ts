@@ -16,7 +16,9 @@ export class TokenService {
         }
 
         try {
-            privateKey = Config.PRIVATE_KEY;
+            privateKey = Buffer.from(Config.PRIVATE_KEY, 'base64').toString(
+                'utf-8',
+            );
         } catch (err) {
             const error = createHttpError(500, 'Error reading private key');
             throw error;

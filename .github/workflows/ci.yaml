@@ -1,0 +1,79 @@
+name: CI
+
+on:
+    pull_request:
+        branches:
+            - main
+    push:
+        branches:
+            - main
+
+jobs:
+    build:
+        name: Build and Test
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20.x'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run ESLint
+              run: npm run lint
+
+            - name: Run tests and generate coverage
+              run: npm test
+
+              env:
+                  DB_HOST: ${{ secrets.TEST_DB_HOST }}
+                  DB_PORT: ${{ secrets.TEST_DB_PORT }}
+                  DB_USERNAME: ${{ secrets.TEST_DB_USERNAME }}
+                  DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+                  DB_NAME: ${{ secrets.TEST_DB_NAME }}
+                  REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+                  JWKS_URI: ${{ secrets.JWKS_URI }}
+                  JWKS_MOCK_HOST: ${{ secrets.JWKS_MOCK_HOST }}
+                  PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+
+            - name: Build the app
+              run: npm run build
+
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    build-and-push-docker-image:
+        name: Build and Push Docker Image
+        needs: build
+        runs-on: ubuntu-latest
+
+        env:
+            IMAGE_NAME: amanjain18/pizzeria_auth_service
+            IMAGE_TAG: build-${{ github.run_number }}
+
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Build Docker image
+              run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -f docker/prod/Dockerfile .
+
+            - name: Push Docker image to Docker Hub
+              run: docker push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}

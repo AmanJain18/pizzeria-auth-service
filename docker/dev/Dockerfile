@@ -19,7 +19,7 @@ RUN npm install --silent
 COPY . .
 
 # Expose the port the app will run on
-EXPOSE 3000
+EXPOSE 5000
 
 # The command to run our app when the container is running
 CMD ["npm", "run", "dev"]

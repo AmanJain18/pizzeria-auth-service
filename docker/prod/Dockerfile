@@ -36,7 +36,7 @@ RUN npm ci --ignore-scripts
 COPY --from=build /app/dist ./dist
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 5501
 
 # Serve the app
 CMD ["node", "dist/src/server.js"]

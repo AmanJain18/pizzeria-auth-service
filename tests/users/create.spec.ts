@@ -6,13 +6,14 @@ import { AppDataSource } from '../../src/config/data-source';
 import { Roles } from '../../src/constants';
 import { User } from '../../src/entity/User';
 import { Tenant } from '../../src/entity/Tenant';
+import { Config } from '../../src/config';
 
 describe('POST /users', () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
 
     beforeAll(async () => {
-        jwks = createJWKSMock('http://localhost:3000');
+        jwks = createJWKSMock(Config.JWKS_MOCK_HOST!);
         connection = await AppDataSource.initialize();
     });
 

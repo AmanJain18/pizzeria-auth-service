@@ -18,6 +18,7 @@ const {
     DB_NAME,
     REFRESH_TOKEN_SECRET,
     JWKS_URI,
+    JWKS_MOCK_HOST,
     PRIVATE_KEY,
 } = process.env;
 
@@ -31,5 +32,6 @@ export const Config = {
     DB_NAME,
     REFRESH_TOKEN_SECRET,
     JWKS_URI,
+    JWKS_MOCK_HOST,
     PRIVATE_KEY,
 };

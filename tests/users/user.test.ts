@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../src/config/data-source';
 import { User } from '../../src/entity/User';
 import { Roles } from '../../src/constants';
+import { Config } from '../../src/config';
 // import bcrypt from 'bcryptjs';
 // import { extractTokenFromCookie, isValidJwt } from '../utils';
 
@@ -13,7 +14,7 @@ describe('GET /auth/self', () => {
     let jwks: ReturnType<typeof createJWKSMock>;
 
     beforeAll(async () => {
-        jwks = createJWKSMock('http://localhost:3000');
+        jwks = createJWKSMock(Config.JWKS_MOCK_HOST!);
         connection = await AppDataSource.initialize();
     });
 

@@ -1,4 +1,9 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, {
+    NextFunction,
+    Request,
+    RequestHandler,
+    Response,
+} from 'express';
 import { TenantService } from '../services/TenantService';
 import { TenantController } from '../controllers/TenantController';
 import { AppDataSource } from '../config/data-source';
@@ -17,44 +22,46 @@ const tenantController = new TenantController(tenantService, logger);
 // Create a new tenant
 router.post(
     '/',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     tenantValidator,
     (req: Request, res: Response, next: NextFunction) =>
-        tenantController.create(req, res, next),
+        tenantController.create(req, res, next) as unknown as RequestHandler,
 );
 
 // Update a tenant
 router.patch(
     '/:id',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     tenantValidator,
     (req: Request, res: Response, next: NextFunction) =>
-        tenantController.update(req, res, next),
+        tenantController.update(req, res, next) as unknown as RequestHandler,
 );
 
 // Get all tenants
-router.get('/', (req: Request, res: Response, next: NextFunction) =>
-    tenantController.getAll(req, res, next),
+router.get(
+    '/',
+    (req: Request, res: Response, next: NextFunction) =>
+        tenantController.getAll(req, res, next) as unknown as RequestHandler,
 );
 
 // Get a tenant by id
 router.get(
     '/:id',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
-        tenantController.getOne(req, res, next),
+        tenantController.getOne(req, res, next) as unknown as RequestHandler,
 );
 
 // Delete a tenant
 router.delete(
     '/:id',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
-        tenantController.delete(req, res, next),
+        tenantController.delete(req, res, next) as unknown as RequestHandler,
 );
 
 export default router;

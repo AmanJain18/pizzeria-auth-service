@@ -1,4 +1,9 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, {
+    NextFunction,
+    Request,
+    RequestHandler,
+    Response,
+} from 'express';
 import { UserService } from '../services/UserService';
 import { UserController } from '../controllers/UserController';
 import { AppDataSource } from '../config/data-source';
@@ -19,48 +24,48 @@ const userController = new UserController(userService, logger);
 // Create a new user by admin
 router.post(
     '/',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     createUserValidator,
     (req: CreateUserRequest, res: Response, next: NextFunction) =>
-        userController.create(req, res, next),
+        userController.create(req, res, next) as unknown as RequestHandler,
 );
 
 // Update a user by admin - Manager and other support roles (Employees)
 router.patch(
     '/:id',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     updateUserValidator,
     (req: UpdateUserRequest, res: Response, next: NextFunction) =>
-        userController.update(req, res, next),
+        userController.update(req, res, next) as unknown as RequestHandler,
 );
 
 // Get all users
 router.get(
     '/',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
-        userController.getAll(req, res, next),
+        userController.getAll(req, res, next) as unknown as RequestHandler,
 );
 
 // Get a user by id
 router.get(
     '/:id',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
-        userController.getOne(req, res, next),
+        userController.getOne(req, res, next) as unknown as RequestHandler,
 );
 
 // Delete a user
 router.delete(
     '/:id',
-    authenticateUser,
+    authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
     (req: Request, res: Response, next: NextFunction) =>
-        userController.delete(req, res, next),
+        userController.delete(req, res, next) as unknown as RequestHandler,
 );
 
 export default router;

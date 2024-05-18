@@ -11,9 +11,9 @@ import { TokenService } from '../services/TokenService';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/User';
 import logger from '../config/logger';
-import registerValidators from '../validators/register-validator';
+import registerValidator from '../validators/register-validator';
 import { RefreshToken } from '../entity/RefreshToken';
-import loginValidators from '../validators/login-validator';
+import loginValidator from '../validators/login-validator';
 import { CredentialService } from '../services/CredentialService';
 import authenticate from '../middlewares/authenticateUser';
 import validateRefreshToken from '../middlewares/validateRefreshToken';
@@ -35,27 +35,37 @@ const authController = new AuthController(
 // Register a new user
 router.post(
     '/register',
-    registerValidators,
+    registerValidator,
     (req: Request, res: Response, next: NextFunction) =>
-        authController.register(req, res, next),
+        authController.register(req, res, next) as unknown as RequestHandler,
 );
 // Login a user
 router.post(
     '/login',
-    loginValidators,
+    loginValidator,
     (req: Request, res: Response, next: NextFunction) =>
-        authController.login(req, res, next),
+        authController.login(req, res, next) as unknown as RequestHandler,
 );
 // Check if the user is logged in and return the user's information - self information
-router.get('/self', authenticate, (req: Request, res: Response) =>
-    authController.self(req as AuthRequest, res),
+router.get(
+    '/self',
+    authenticate as RequestHandler,
+    (req: Request, res: Response) =>
+        authController.self(
+            req as AuthRequest,
+            res,
+        ) as unknown as RequestHandler,
 );
 
 router.post(
     '/refresh',
-    validateRefreshToken,
+    validateRefreshToken as RequestHandler,
     (req: Request, res: Response, next: NextFunction) =>
-        authController.refresh(req as AuthRequest, res, next),
+        authController.refresh(
+            req as AuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
 );
 
 router.post(

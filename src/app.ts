@@ -5,8 +5,16 @@ import authRouter from './routes/auth';
 import tenantRouter from './routes/tenant';
 import userRouter from './routes/user';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 const app = express();
+
+app.use(
+    cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+    }),
+);
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));

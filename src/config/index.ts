@@ -20,6 +20,8 @@ const {
     JWKS_URI,
     JWKS_MOCK_HOST,
     PRIVATE_KEY,
+    SUPER_ADMIN_EMAIL,
+    SUPER_ADMIN_PASSWORD,
 } = process.env;
 
 export const Config = {
@@ -34,4 +36,6 @@ export const Config = {
     JWKS_URI,
     JWKS_MOCK_HOST,
     PRIVATE_KEY,
+    SUPER_ADMIN_EMAIL,
+    SUPER_ADMIN_PASSWORD,
 };

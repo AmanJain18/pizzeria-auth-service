@@ -2,30 +2,11 @@ import request from 'supertest';
 import app from '../../src/app';
 import { User } from '../../src/entity/User';
 import { RefreshToken } from '../../src/entity/RefreshToken';
-import { DataSource } from 'typeorm';
-import { AppDataSource } from '../../src/config/data-source';
 import { Roles } from '../../src/constants';
 import { extractTokenFromCookie, isValidJwt } from '../utils';
+import { connection } from '../utils/testSetup';
 
 describe('POST /auth/register', () => {
-    // This will hold the database connection
-    let connection: DataSource;
-    beforeAll(async () => {
-        // This will create the database connection before all tests
-        connection = await AppDataSource.initialize();
-    });
-
-    beforeEach(async () => {
-        // This will clear the database before each test (Truncate/Drop and synchronize the database)
-        await connection.dropDatabase();
-        await connection.synchronize();
-    });
-
-    afterAll(async () => {
-        // This will close the database connection after all tests
-        await connection.destroy();
-    });
-
     describe('Successful Registration', () => {
         it('should return status code 201', async () => {
             // Arrange

@@ -1,37 +1,11 @@
 import request from 'supertest';
 import app from '../../src/app';
-import createJWKSMock from 'mock-jwks';
-import { DataSource } from 'typeorm';
-import { AppDataSource } from '../../src/config/data-source';
 import { Roles } from '../../src/constants';
 import { User } from '../../src/entity/User';
 import { Tenant } from '../../src/entity/Tenant';
-import { Config } from '../../src/config';
+import { connection, jwks } from '../utils/testSetup';
 
 describe('POST /users', () => {
-    let connection: DataSource;
-    let jwks: ReturnType<typeof createJWKSMock>;
-
-    beforeAll(async () => {
-        jwks = createJWKSMock(Config.JWKS_MOCK_HOST!);
-        connection = await AppDataSource.initialize();
-    });
-
-    beforeEach(async () => {
-        jwks.start();
-        await connection.dropDatabase();
-        await connection.synchronize();
-    });
-
-    afterEach(() => {
-        jwks.stop();
-    });
-
-    afterAll(async () => {
-        await connection.destroy();
-        jwks.stop();
-    });
-
     describe('User created by admin', () => {
         it('should return status code 201', async () => {
             // Create tenant first

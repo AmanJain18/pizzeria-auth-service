@@ -17,9 +17,9 @@ export class Tenant {
     @Column('varchar', { length: 255 })
     address: string;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ select: false })
     updatedAt: Date;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ select: false })
     createdAt: Date;
 }

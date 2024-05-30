@@ -37,7 +37,7 @@ export class UserService {
                 email,
                 password: hashPassword,
                 role,
-                tenantId: tenantId ? { id: tenantId } : undefined,
+                tenant: tenantId ? { id: tenantId } : undefined,
             });
         } catch (err) {
             // If an error occurs while saving, throw an error
@@ -65,6 +65,9 @@ export class UserService {
     async findById(id: number) {
         return await this.userRepository.findOne({
             where: { id: id },
+            relations: {
+                tenant: true,
+            },
         });
     }
 
@@ -95,7 +98,19 @@ export class UserService {
 
     // Get all users
     async getUsers() {
-        return await this.userRepository.find();
+        return await this.userRepository.find({
+            select: [
+                'id',
+                'firstName',
+                'lastName',
+                'email',
+                'role',
+                'createdAt',
+            ],
+            relations: {
+                tenant: true,
+            },
+        });
     }
 
     // Delete a user by Id

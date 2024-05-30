@@ -19,9 +19,9 @@ export class RefreshToken {
     @ManyToOne(() => User)
     user: User;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ select: false })
     updatedAt: Date;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ select: false })
     createdAt: Date;
 }

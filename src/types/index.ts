@@ -66,4 +66,6 @@ export interface UpdateUserRequest extends Request {
 export interface IUserQueryParams {
     currentPage: number;
     pageSize: number;
+    q: string;
+    role: string;
 }

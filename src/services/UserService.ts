@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import { User } from '../entity/User';
 import { IUpdateUserByAdmin, IUserQueryParams, UserData } from '../types';
@@ -106,6 +106,24 @@ export class UserService {
     async getUsers(validatedQuery: IUserQueryParams) {
         const { currentPage, pageSize } = validatedQuery;
         const queryBuilder = this.userRepository.createQueryBuilder('user');
+        if (validatedQuery.q) {
+            const searchedTerm = `%${validatedQuery.q}%`;
+            queryBuilder.where(
+                new Brackets((qb) => {
+                    qb.where(
+                        "CONCAT(user.firstName, ' ', user.lastName) ILike :q",
+                        { q: searchedTerm },
+                    ).orWhere('user.email ILike :q', { q: searchedTerm });
+                }),
+            );
+        }
+
+        if (validatedQuery.role) {
+            queryBuilder.andWhere('user.role = :role', {
+                role: validatedQuery.role,
+            });
+        }
+
         const users = await queryBuilder
             .select([
                 'user.id',

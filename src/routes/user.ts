@@ -1,9 +1,5 @@
-import express, {
-    NextFunction,
-    Request,
-    RequestHandler,
-    Response,
-} from 'express';
+import express, { NextFunction, RequestHandler, Response } from 'express';
+import { Request } from 'express-jwt';
 import { UserService } from '../services/UserService';
 import { UserController } from '../controllers/UserController';
 import { AppDataSource } from '../config/data-source';
@@ -15,6 +11,7 @@ import createUserValidator from '../validators/create-user-validator';
 import updateUserValidator from '../validators/update-user-validator';
 import authenticateUser from '../middlewares/authenticateUser';
 import logger from '../config/logger';
+import listUserValidators from '../validators/list-user-validators';
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -46,6 +43,7 @@ router.get(
     '/',
     authenticateUser as RequestHandler,
     isAuthorized([Roles.ADMIN]),
+    listUserValidators,
     (req: Request, res: Response, next: NextFunction) =>
         userController.getAll(req, res, next) as unknown as RequestHandler,
 );

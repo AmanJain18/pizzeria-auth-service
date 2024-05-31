@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import { User } from '../entity/User';
-import { IUpdateUserByAdmin, UserData } from '../types';
+import { IUpdateUserByAdmin, IUserQueryParams, UserData } from '../types';
 import createHttpError from 'http-errors';
 
 export class UserService {
@@ -74,7 +74,7 @@ export class UserService {
     // Update user data by admin
     async updateEmployeeUser(
         userId: number,
-        updateUserData: IUpdateUserByAdmin,
+        { firstName, lastName, role, email, tenantId }: IUpdateUserByAdmin,
     ) {
         // Check if the user exists
         const userExist = await this.userRepository.findOne({
@@ -88,7 +88,13 @@ export class UserService {
 
         // Update user data
         try {
-            await this.userRepository.update(userId, updateUserData);
+            await this.userRepository.update(userId, {
+                firstName,
+                lastName,
+                email,
+                role,
+                tenant: tenantId ? { id: tenantId } : undefined,
+            });
         } catch (err) {
             // If an error occurs while updating, throw an error
             const error = createHttpError(500, 'Error updating user data');
@@ -97,20 +103,24 @@ export class UserService {
     }
 
     // Get all users
-    async getUsers() {
-        return await this.userRepository.find({
-            select: [
-                'id',
-                'firstName',
-                'lastName',
-                'email',
-                'role',
-                'createdAt',
-            ],
-            relations: {
-                tenant: true,
-            },
-        });
+    async getUsers(validatedQuery: IUserQueryParams) {
+        const { currentPage, pageSize } = validatedQuery;
+        const queryBuilder = this.userRepository.createQueryBuilder('user');
+        const users = await queryBuilder
+            .select([
+                'user.id',
+                'user.firstName',
+                'user.lastName',
+                'user.email',
+                'user.role',
+                'user.createdAt',
+            ])
+            .leftJoinAndSelect('user.tenant', 'tenant')
+            .skip((currentPage - 1) * pageSize)
+            .take(pageSize)
+            .orderBy('user.id', 'DESC')
+            .getManyAndCount();
+        return users;
     }
 
     // Delete a user by Id

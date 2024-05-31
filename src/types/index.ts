@@ -55,10 +55,15 @@ export interface IUpdateUserByAdmin {
     firstName: string;
     lastName: string;
     email: string;
-    tenantId?: string;
     role: string;
+    tenantId?: number;
 }
 
 export interface UpdateUserRequest extends Request {
     body: IUpdateUserByAdmin;
+}
+
+export interface IUserQueryParams {
+    currentPage: number;
+    pageSize: number;
 }

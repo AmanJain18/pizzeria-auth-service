@@ -2,30 +2,12 @@ import express from 'express';
 import authRouter from './routes/auth';
 import tenantRouter from './routes/tenant';
 import userRouter from './routes/user';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
+import { configSetup } from './config/configSetup';
 import { globalErrorHandler } from './middlewares/globalErrorHandler';
 
 const app = express();
 
-app.use(
-    cors({
-        origin: 'http://localhost:3000',
-        credentials: true,
-    }),
-);
-
-// Serve static files from the 'public' directory
-app.use(express.static('public'));
-
-// Parse JSON request bodies
-app.use(express.json());
-
-// Parse URL-encoded request bodies
-app.use(express.urlencoded({ extended: true }));
-
-// Parse cookies
-app.use(cookieParser());
+configSetup(app);
 
 // Define a route for the root URL
 app.get('/', (req, res) => {

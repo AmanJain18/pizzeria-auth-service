@@ -93,7 +93,7 @@ export class UserService {
                 lastName,
                 email,
                 role,
-                tenant: tenantId ? { id: tenantId } : undefined,
+                tenant: tenantId ? { id: tenantId } : null,
             });
         } catch (err) {
             // If an error occurs while updating, throw an error

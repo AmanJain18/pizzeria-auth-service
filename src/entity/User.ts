@@ -29,7 +29,7 @@ export class User {
     role: string;
 
     @ManyToOne(() => Tenant)
-    tenant: Tenant;
+    tenant: Tenant | null;
 
     @UpdateDateColumn({ select: false })
     updatedAt: Date;

@@ -33,7 +33,7 @@ export class TokenService {
     }
     // Create a refresh token
     generateRefreshToken(paylod: JwtPayload) {
-        const refreshToken = sign(paylod, Config.REFRESH_TOKEN_SECRET!, {
+        const refreshToken = sign(paylod, Config.REFRESH_TOKEN_SECRET, {
             algorithm: 'HS256', // HMAC SHA-256 hash algorithm
             expiresIn: '30d', // 30 days
             issuer: 'auth-service', // Issuer

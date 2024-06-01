@@ -25,6 +25,10 @@ export default checkSchema(
                     return isNaN(parsedValue) ? 1 : parsedValue;
                 },
             },
+            isInt: {
+                options: { min: 1 },
+                errorMessage: 'Current page must be a positive integer',
+            },
         },
         pageSize: {
             customSanitizer: {
@@ -32,6 +36,10 @@ export default checkSchema(
                     const parsedValue = Number(value);
                     return isNaN(parsedValue) ? 10 : parsedValue;
                 },
+            },
+            isInt: {
+                options: { min: 1 },
+                errorMessage: 'Page size must be a positive integer',
             },
         },
     },

@@ -5,11 +5,19 @@ export default checkSchema({
         errorMessage: 'First name is required',
         notEmpty: true,
         trim: true,
+        isLength: {
+            options: { min: 2 },
+            errorMessage: 'First name must be at least 2 characters long',
+        },
     },
     lastName: {
         errorMessage: 'Last name is required',
         notEmpty: true,
         trim: true,
+        isLength: {
+            options: { min: 2 },
+            errorMessage: 'Last name must be at least 2 characters long',
+        },
     },
     email: {
         errorMessage: 'Email is required',

@@ -39,6 +39,7 @@ router.post(
     (req: Request, res: Response, next: NextFunction) =>
         authController.register(req, res, next) as unknown as RequestHandler,
 );
+
 // Login a user
 router.post(
     '/login',
@@ -46,6 +47,7 @@ router.post(
     (req: Request, res: Response, next: NextFunction) =>
         authController.login(req, res, next) as unknown as RequestHandler,
 );
+
 // Check if the user is logged in and return the user's information - self information
 router.get(
     '/self',
@@ -57,6 +59,7 @@ router.get(
         ) as unknown as RequestHandler,
 );
 
+// Refresh access token
 router.post(
     '/refresh',
     validateRefreshToken as RequestHandler,
@@ -68,6 +71,7 @@ router.post(
         ) as unknown as RequestHandler,
 );
 
+// Logout a user
 router.post(
     '/logout',
     authenticate as RequestHandler,

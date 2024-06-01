@@ -21,7 +21,7 @@ const startServer = async () => {
         });
     } catch (err) {
         if (err instanceof Error) {
-            logger.error(err.message);
+            logger.error('Failed to start server:', err);
             setTimeout(() => process.exit(1), 1000);
         }
     }

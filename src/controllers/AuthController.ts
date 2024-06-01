@@ -26,10 +26,7 @@ export class AuthController {
         const result = validationResult(req);
         // If there are errors, return them
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
         const { firstName, lastName, email, password } = req.body;
         // Log the request
@@ -89,10 +86,7 @@ export class AuthController {
     async login(req: LoginUserRequest, res: Response, next: NextFunction) {
         const result = validationResult(req);
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
         const { email, password } = req.body;
         // Log the request
@@ -100,13 +94,6 @@ export class AuthController {
             email,
             password: '******',
         });
-
-        // Try to log in the user
-        // Check if the user exists
-        // Compare the password
-        // Generate tokens
-        // Set the cookies
-        // Return the response
 
         try {
             const user = await this.userService.userExist(email);
@@ -168,7 +155,7 @@ export class AuthController {
     async self(req: AuthRequest, res: Response) {
         // If the user is logged in, return the user's information by checking the token
         const user = await this.userService.findById(Number(req.auth.sub));
-        res.status(200).json({ ...user, password: undefined });
+        res.status(200).json(user);
     }
 
     async refresh(req: AuthRequest, res: Response, next: NextFunction) {
@@ -185,7 +172,7 @@ export class AuthController {
             if (!user) {
                 const error = createHttpError(
                     400,
-                    'User with the token could not find',
+                    'User associated with the token could not be found',
                 );
                 next(error);
                 return;
@@ -220,9 +207,9 @@ export class AuthController {
             this.logger.info('New Access and Refresh Token assign', {
                 id: user.id,
             });
-            res.json({ id: user.id });
-        } catch (error) {
-            next(error);
+            res.status(200).json({ id: user.id });
+        } catch (err) {
+            next(err);
             return;
         }
     }
@@ -237,7 +224,7 @@ export class AuthController {
 
             res.clearCookie('accessToken');
             res.clearCookie('refreshToken');
-            res.json({});
+            res.status(200).json({});
         } catch (err) {
             next(err);
             return;

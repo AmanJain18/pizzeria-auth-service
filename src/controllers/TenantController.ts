@@ -15,10 +15,7 @@ export class TenantController {
         const result = validationResult(req);
         // If there are errors, return them
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
 
         const { name, address } = req.body;
@@ -43,10 +40,7 @@ export class TenantController {
         const result = validationResult(req);
         // If there are errors, return them
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
 
         const { name, address } = req.body;
@@ -67,7 +61,7 @@ export class TenantController {
 
             this.logger.info('Tenant has been updated', { id: tenantId });
 
-            res.json({ id: Number(tenantId) });
+            res.status(200).json({ id: Number(tenantId) });
         } catch (err) {
             next(err);
             return;
@@ -78,7 +72,7 @@ export class TenantController {
         try {
             const tenants = await this.tenantService.getTenants();
             this.logger.info('All tenants have been fetched');
-            res.json(tenants);
+            res.status(200).json(tenants);
         } catch (err) {
             next(err);
             return;
@@ -89,8 +83,7 @@ export class TenantController {
         const tenantId = req.params.id;
 
         if (isNaN(Number(tenantId))) {
-            next(createHttpError(400, 'Invalid url parameter'));
-            return;
+            return next(createHttpError(400, 'Invalid url parameter'));
         }
 
         try {
@@ -99,12 +92,11 @@ export class TenantController {
             );
 
             if (!tenant) {
-                next(createHttpError(400, 'Tenant not found'));
-                return;
+                return next(createHttpError(400, 'Tenant not found'));
             }
 
             this.logger.info('Tenant have been fetched');
-            res.json(tenant);
+            res.status(200).json(tenant);
         } catch (err) {
             next(err);
             return;
@@ -115,14 +107,13 @@ export class TenantController {
         const tenantId = req.params.id;
 
         if (isNaN(Number(tenantId))) {
-            next(createHttpError(400, 'Invalid url parameter'));
-            return;
+            return next(createHttpError(400, 'Invalid url parameter'));
         }
 
         try {
             await this.tenantService.deleteTenant(Number(tenantId));
             this.logger.info('Tenant has been deleted', { id: tenantId });
-            res.json({ id: Number(tenantId) });
+            res.status(200).json({ id: Number(tenantId) });
         } catch (err) {
             next(err);
             return;

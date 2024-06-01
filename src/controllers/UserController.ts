@@ -19,10 +19,7 @@ export class UserController {
         const result = validationResult(req);
         // If there are errors, return them
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
         const { firstName, lastName, email, password, tenantId, role } =
             req.body;
@@ -51,16 +48,12 @@ export class UserController {
         const result = validationResult(req);
         // If there are errors, return them
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
         const { email, firstName, lastName, role, tenantId } = req.body;
         const userId = req.params.id;
         if (isNaN(Number(userId))) {
-            next(createHttpError(400, 'Invalid url parameter'));
-            return;
+            return next(createHttpError(400, 'Invalid url parameter'));
         }
         // Log the request
         this.logger.debug('Request to update the user', req.body);
@@ -74,7 +67,7 @@ export class UserController {
             });
             this.logger.info('User has been updated', { id: userId });
 
-            res.json({ id: Number(userId) });
+            res.status(200).json({ id: Number(userId) });
         } catch (err) {
             next(err);
             return;
@@ -88,7 +81,7 @@ export class UserController {
                 validatedQuery as IUserQueryParams,
             );
             this.logger.info('All users have been fetched');
-            res.json({
+            res.status(200).json({
                 data: users,
                 currentPage: validatedQuery.currentPage as number,
                 pageSize: validatedQuery.pageSize as number,
@@ -104,20 +97,18 @@ export class UserController {
         const userId = req.params.id;
 
         if (isNaN(Number(userId))) {
-            next(createHttpError(400, 'Invalid url parameter'));
-            return;
+            return next(createHttpError(400, 'Invalid url parameter'));
         }
 
         try {
             const user = await this.userService.findById(Number(userId));
 
             if (!user) {
-                next(createHttpError(400, 'User not found'));
-                return;
+                return next(createHttpError(400, 'User not found'));
             }
 
             this.logger.info('User have been fetched', { id: user.id });
-            res.json(user);
+            res.status(200).json(user);
         } catch (err) {
             next(err);
             return;
@@ -128,14 +119,13 @@ export class UserController {
         const userId = req.params.id;
 
         if (isNaN(Number(userId))) {
-            next(createHttpError(400, 'Invalid url parameter'));
-            return;
+            return next(createHttpError(400, 'Invalid url parameter'));
         }
 
         try {
             await this.userService.deleteUser(Number(userId));
             this.logger.info('Tenant has been deleted', { id: userId });
-            res.json({ id: Number(userId) });
+            res.status(200).json({ id: Number(userId) });
         } catch (err) {
             next(err);
             return;

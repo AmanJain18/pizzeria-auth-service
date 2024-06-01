@@ -1,11 +1,12 @@
 import { Request } from 'express';
+import { Role } from '../constants';
 
 export interface UserData {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
-    role: string;
+    role: Role;
     tenantId?: number;
 }
 
@@ -23,7 +24,7 @@ export interface LoginUserRequest extends Request {
 export interface AuthRequest extends Request {
     auth: {
         sub: string;
-        role: string;
+        role: Role;
         id?: string;
         iss?: string;
     };
@@ -55,7 +56,7 @@ export interface IUpdateUserByAdmin {
     firstName: string;
     lastName: string;
     email: string;
-    role: string;
+    role: Role;
     tenantId?: number;
 }
 
@@ -67,5 +68,5 @@ export interface IUserQueryParams {
     currentPage: number;
     pageSize: number;
     q: string;
-    role: string;
+    role: Role;
 }

@@ -3,9 +3,11 @@ import { Config } from '../config';
 export const Roles = {
     ADMIN: 'admin',
     CUSTOMER: 'customer',
-    Manager: 'manager',
-    Support: 'support',
+    MANAGER: 'manager',
+    SUPPORT: 'support',
 } as const;
+
+export type Role = (typeof Roles)[keyof typeof Roles];
 
 export const SuperAdmin = {
     firstName: 'Super',

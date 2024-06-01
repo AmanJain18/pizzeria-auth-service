@@ -34,7 +34,6 @@ export class AuthController {
             firstName,
             lastName,
             email,
-            password: '******',
         });
         try {
             const user = await this.userService.registerUser({
@@ -92,26 +91,18 @@ export class AuthController {
         // Log the request
         this.logger.debug('New request to login a user', {
             email,
-            password: '******',
         });
 
         try {
             const user = await this.userService.userExist(email);
-            if (!user) {
-                const error = createHttpError(400, 'Invalid Email or password');
-                next(error);
-                return;
-            }
-
-            const passwordMatch = await this.credentialService.comparePassword(
-                password,
-                user.password,
-            );
-
-            if (!passwordMatch) {
-                const error = createHttpError(400, 'Invalid Email or password');
-                next(error);
-                return;
+            if (
+                !user ||
+                !(await this.credentialService.comparePassword(
+                    password,
+                    user.password,
+                ))
+            ) {
+                return next(createHttpError(400, 'Invalid Email or password'));
             }
 
             const payload: JwtPayload = {
@@ -170,12 +161,12 @@ export class AuthController {
 
             const user = await this.userService.findById(Number(req.auth.sub));
             if (!user) {
-                const error = createHttpError(
-                    400,
-                    'User associated with the token could not be found',
+                return next(
+                    createHttpError(
+                        400,
+                        'User associated with the token could not be found',
+                    ),
                 );
-                next(error);
-                return;
             }
 
             // Persist the refresh token

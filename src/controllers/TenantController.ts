@@ -11,15 +11,12 @@ export class TenantController {
         private logger: Logger,
     ) {}
     async create(req: CreateTenantRequest, res: Response, next: NextFunction) {
-        // Validate the request
         const result = validationResult(req);
-        // If there are errors, return them
         if (!result.isEmpty()) {
             return next(createHttpError(400, result.array()[0].msg as string));
         }
 
         const { name, address } = req.body;
-        // Log the request
         this.logger.debug('New request to create a tenant', req.body);
         try {
             const tenant = await this.tenantService.createTenant({
@@ -36,9 +33,7 @@ export class TenantController {
     }
 
     async update(req: CreateTenantRequest, res: Response, next: NextFunction) {
-        // Validate the request
         const result = validationResult(req);
-        // If there are errors, return them
         if (!result.isEmpty()) {
             return next(createHttpError(400, result.array()[0].msg as string));
         }
@@ -50,7 +45,6 @@ export class TenantController {
             next(createHttpError(400, 'Invalid url parameter'));
             return;
         }
-        // Log the request
         this.logger.debug('Request to update a tenant', req.body);
 
         try {

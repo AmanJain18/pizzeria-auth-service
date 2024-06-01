@@ -15,15 +15,12 @@ export class UserController {
         private logger: Logger,
     ) {}
     async create(req: CreateUserRequest, res: Response, next: NextFunction) {
-        // Validate the request
         const result = validationResult(req);
-        // If there are errors, return them
         if (!result.isEmpty()) {
             return next(createHttpError(400, result.array()[0].msg as string));
         }
         const { firstName, lastName, email, password, tenantId, role } =
             req.body;
-        // Log the request
         this.logger.debug('New request to create a tenant', req.body);
         try {
             const user = await this.userService.registerUser({
@@ -44,9 +41,7 @@ export class UserController {
     }
 
     async update(req: UpdateUserRequest, res: Response, next: NextFunction) {
-        // Validate the request
         const result = validationResult(req);
-        // If there are errors, return them
         if (!result.isEmpty()) {
             return next(createHttpError(400, result.array()[0].msg as string));
         }
@@ -55,7 +50,6 @@ export class UserController {
         if (isNaN(Number(userId))) {
             return next(createHttpError(400, 'Invalid url parameter'));
         }
-        // Log the request
         this.logger.debug('Request to update the user', req.body);
         try {
             await this.userService.updateEmployeeUser(Number(userId), {

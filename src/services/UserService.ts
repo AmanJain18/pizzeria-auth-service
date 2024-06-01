@@ -113,7 +113,11 @@ export class UserService {
                     qb.where(
                         "CONCAT(user.firstName, ' ', user.lastName) ILike :q",
                         { q: searchedTerm },
-                    ).orWhere('user.email ILike :q', { q: searchedTerm });
+                    )
+                        .orWhere('user.email ILike :q', { q: searchedTerm })
+                        .orWhere('tenant.name ILike :q', {
+                            q: searchedTerm,
+                        });
                 }),
             );
         }

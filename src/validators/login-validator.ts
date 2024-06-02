@@ -19,6 +19,3 @@ export default checkSchema({
         trim: true,
     },
 });
-
-// Different ways to export the same thing:
-// export default [body("email").notEmpty().withMessage("Email is required!")]

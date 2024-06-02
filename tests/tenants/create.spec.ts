@@ -14,7 +14,7 @@ describe('POST /tenants', () => {
                 role: Roles.ADMIN,
             });
 
-            const tentantData = {
+            const tenantData = {
                 name: 'Tenant Name',
                 address: 'Tenant Address',
             };
@@ -23,7 +23,7 @@ describe('POST /tenants', () => {
             const response = await request(app)
                 .post('/tenants')
                 .set('Cookie', [`accessToken=${adminToken}`])
-                .send(tentantData);
+                .send(tenantData);
 
             // Assert
             expect(response.statusCode).toBe(201);
@@ -37,7 +37,7 @@ describe('POST /tenants', () => {
                 role: Roles.ADMIN,
             });
 
-            const tentantData = {
+            const tenantData = {
                 name: 'Tenant Name',
                 address: 'Tenant Address',
             };
@@ -46,20 +46,20 @@ describe('POST /tenants', () => {
             await request(app)
                 .post('/tenants')
                 .set('Cookie', [`accessToken=${adminToken}`])
-                .send(tentantData);
+                .send(tenantData);
 
             const tenantRepository = connection.getRepository(Tenant);
             const tenants = await tenantRepository.find();
 
             // Assert
             expect(tenants).toHaveLength(1);
-            expect(tenants[0].name).toBe(tentantData.name);
-            expect(tenants[0].address).toBe(tentantData.address);
+            expect(tenants[0].name).toBe(tenantData.name);
+            expect(tenants[0].address).toBe(tenantData.address);
         });
 
         it('should return status code 401 if user is not authenticated', async () => {
             // Arrange
-            const tentantData = {
+            const tenantData = {
                 name: 'Tenant Name',
                 address: 'Tenant Address',
             };
@@ -67,7 +67,7 @@ describe('POST /tenants', () => {
             // Act
             const response = await request(app)
                 .post('/tenants')
-                .send(tentantData);
+                .send(tenantData);
 
             const tenantRepository = connection.getRepository(Tenant);
             const tenants = await tenantRepository.find();
@@ -85,7 +85,7 @@ describe('POST /tenants', () => {
                 role: Roles.CUSTOMER,
             });
 
-            const tentantData = {
+            const tenantData = {
                 name: 'Tenant Name',
                 address: 'Tenant Address',
             };
@@ -94,7 +94,7 @@ describe('POST /tenants', () => {
             const response = await request(app)
                 .post('/tenants')
                 .set('Cookie', [`accessToken=${notAdminToken}`])
-                .send(tentantData);
+                .send(tenantData);
 
             const tenantRepository = connection.getRepository(Tenant);
             const tenants = await tenantRepository.find();

@@ -3,6 +3,7 @@ import { UserData } from '../types';
 import { AppDataSource } from './data-source';
 import bcrypt from 'bcryptjs';
 import logger from './logger';
+import { Config } from '.';
 
 export const createAdminUser = async ({
     firstName,
@@ -19,11 +20,12 @@ export const createAdminUser = async ({
                 const existingAdmin = await transactionalEntityManager.findOne(
                     User,
                     {
-                        where: { role: 'admin', email: email },
+                        where: { role: 'admin', email },
                     },
                 );
                 if (!existingAdmin) {
-                    const saltRounds = 10;
+                    const saltRounds = Config.BCRYPT_SALT_ROUNDS || 10;
+
                     const hashPassword = await bcrypt.hash(
                         password,
                         saltRounds,

@@ -17,12 +17,18 @@ const {
     DB_PASSWORD,
     DB_NAME,
     REFRESH_TOKEN_SECRET,
+    CORS_ORIGIN,
     JWKS_URI,
     JWKS_MOCK_HOST,
     PRIVATE_KEY,
     SUPER_ADMIN_EMAIL,
     SUPER_ADMIN_PASSWORD,
+    BCRYPT_SALT_ROUNDS,
 } = process.env;
+
+if (!DB_USERNAME || !DB_PASSWORD || !DB_NAME || !REFRESH_TOKEN_SECRET) {
+    throw new Error('Missing critical environment variables.');
+}
 
 export const Config = {
     PORT,
@@ -33,9 +39,11 @@ export const Config = {
     DB_PASSWORD,
     DB_NAME,
     REFRESH_TOKEN_SECRET,
+    CORS_ORIGIN,
     JWKS_URI,
     JWKS_MOCK_HOST,
     PRIVATE_KEY,
     SUPER_ADMIN_EMAIL,
     SUPER_ADMIN_PASSWORD,
+    BCRYPT_SALT_ROUNDS: Number(BCRYPT_SALT_ROUNDS),
 };

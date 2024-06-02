@@ -26,10 +26,7 @@ export class AuthController {
         const result = validationResult(req);
         // If there are errors, return them
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
         const { firstName, lastName, email, password } = req.body;
         // Log the request
@@ -37,7 +34,6 @@ export class AuthController {
             firstName,
             lastName,
             email,
-            password: '******',
         });
         try {
             const user = await this.userService.registerUser({
@@ -89,42 +85,24 @@ export class AuthController {
     async login(req: LoginUserRequest, res: Response, next: NextFunction) {
         const result = validationResult(req);
         if (!result.isEmpty()) {
-            res.status(400).json({
-                errors: result.array(),
-            });
-            return;
+            return next(createHttpError(400, result.array()[0].msg as string));
         }
         const { email, password } = req.body;
         // Log the request
         this.logger.debug('New request to login a user', {
             email,
-            password: '******',
         });
-
-        // Try to log in the user
-        // Check if the user exists
-        // Compare the password
-        // Generate tokens
-        // Set the cookies
-        // Return the response
 
         try {
             const user = await this.userService.userExist(email);
-            if (!user) {
-                const error = createHttpError(400, 'Invalid Email or password');
-                next(error);
-                return;
-            }
-
-            const passwordMatch = await this.credentialService.comparePassword(
-                password,
-                user.password,
-            );
-
-            if (!passwordMatch) {
-                const error = createHttpError(400, 'Invalid Email or password');
-                next(error);
-                return;
+            if (
+                !user ||
+                !(await this.credentialService.comparePassword(
+                    password,
+                    user.password,
+                ))
+            ) {
+                return next(createHttpError(400, 'Invalid Email or password'));
             }
 
             const payload: JwtPayload = {
@@ -168,7 +146,7 @@ export class AuthController {
     async self(req: AuthRequest, res: Response) {
         // If the user is logged in, return the user's information by checking the token
         const user = await this.userService.findById(Number(req.auth.sub));
-        res.status(200).json({ ...user, password: undefined });
+        res.status(200).json(user);
     }
 
     async refresh(req: AuthRequest, res: Response, next: NextFunction) {
@@ -183,12 +161,12 @@ export class AuthController {
 
             const user = await this.userService.findById(Number(req.auth.sub));
             if (!user) {
-                const error = createHttpError(
-                    400,
-                    'User with the token could not find',
+                return next(
+                    createHttpError(
+                        400,
+                        'User associated with the token could not be found',
+                    ),
                 );
-                next(error);
-                return;
             }
 
             // Persist the refresh token
@@ -220,9 +198,9 @@ export class AuthController {
             this.logger.info('New Access and Refresh Token assign', {
                 id: user.id,
             });
-            res.json({ id: user.id });
-        } catch (error) {
-            next(error);
+            res.status(200).json({ id: user.id });
+        } catch (err) {
+            next(err);
             return;
         }
     }
@@ -237,7 +215,7 @@ export class AuthController {
 
             res.clearCookie('accessToken');
             res.clearCookie('refreshToken');
-            res.json({});
+            res.status(200).json({});
         } catch (err) {
             next(err);
             return;

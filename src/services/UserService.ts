@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { User } from '../entity/User';
 import { IUpdateUserByAdmin, IUserQueryParams, UserData } from '../types';
 import createHttpError from 'http-errors';
+import { Config } from '../config';
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
@@ -20,16 +21,14 @@ export class UserService {
         const userExist = await this.userRepository.findOne({
             where: { email: email },
         });
-        // If the user exists, throw an error
         if (userExist) {
             const error = createHttpError(400, 'User already exists');
             throw error;
         }
-        // Number of salt rounds
-        const saltRounds = 10;
-        // Hashing the password
-        const hashPassword = await bcrypt.hash(password, saltRounds);
-        // Save user data to the database
+
+        const saltRounds = Config.BCRYPT_SALT_ROUNDS || 10; // Number of salt rounds for hashing the password
+        const hashPassword = await bcrypt.hash(password, saltRounds); // Hash the password
+
         try {
             return await this.userRepository.save({
                 firstName,
@@ -40,38 +39,49 @@ export class UserService {
                 tenant: tenantId ? { id: tenantId } : undefined,
             });
         } catch (err) {
-            // If an error occurs while saving, throw an error
             const error = createHttpError(500, 'Error saving user data');
             throw error;
         }
     }
 
-    // Check if the user exists
+    // Check if the user exists by email
     async userExist(email: string) {
-        return await this.userRepository.findOne({
-            where: { email: email },
-            select: [
-                'id',
-                'firstName',
-                'lastName',
-                'email',
-                'password',
-                'role',
-            ],
-        });
+        try {
+            return await this.userRepository.findOne({
+                where: { email: email },
+                select: [
+                    'id',
+                    'firstName',
+                    'lastName',
+                    'email',
+                    'password',
+                    'role',
+                ],
+            });
+        } catch (err) {
+            throw createHttpError(500, 'Error checking if user exists');
+        }
     }
 
     // Find a user by id
     async findById(id: number) {
-        return await this.userRepository.findOne({
-            where: { id: id },
-            relations: {
-                tenant: true,
-            },
-        });
+        try {
+            const user = await this.userRepository.findOne({
+                where: { id: id },
+                relations: {
+                    tenant: true,
+                },
+            });
+            if (!user) {
+                throw createHttpError(404, 'User not found');
+            }
+            return user;
+        } catch (err) {
+            throw createHttpError(500, 'Error retrieving user');
+        }
     }
 
-    // Update user data by admin
+    // Update employee data by admin
     async updateEmployeeUser(
         userId: number,
         { firstName, lastName, role, email, tenantId }: IUpdateUserByAdmin,
@@ -80,13 +90,11 @@ export class UserService {
         const userExist = await this.userRepository.findOne({
             where: { id: userId },
         });
-        // If the user does not exist, throw an error
         if (!userExist) {
             const error = createHttpError(404, 'User not found');
             throw error;
         }
 
-        // Update user data
         try {
             await this.userRepository.update(userId, {
                 firstName,
@@ -96,16 +104,16 @@ export class UserService {
                 tenant: tenantId ? { id: tenantId } : null,
             });
         } catch (err) {
-            // If an error occurs while updating, throw an error
             const error = createHttpError(500, 'Error updating user data');
             throw error;
         }
     }
 
-    // Get all users
+    // Get all users with query parameters
     async getUsers(validatedQuery: IUserQueryParams) {
         const { currentPage, pageSize } = validatedQuery;
         const queryBuilder = this.userRepository.createQueryBuilder('user');
+
         if (validatedQuery.q) {
             const searchedTerm = `%${validatedQuery.q}%`;
             queryBuilder.where(
@@ -115,9 +123,7 @@ export class UserService {
                         { q: searchedTerm },
                     )
                         .orWhere('user.email ILike :q', { q: searchedTerm })
-                        .orWhere('tenant.name ILike :q', {
-                            q: searchedTerm,
-                        });
+                        .orWhere('tenant.name ILike :q', { q: searchedTerm });
                 }),
             );
         }
@@ -128,25 +134,37 @@ export class UserService {
             });
         }
 
-        const users = await queryBuilder
-            .select([
-                'user.id',
-                'user.firstName',
-                'user.lastName',
-                'user.email',
-                'user.role',
-                'user.createdAt',
-            ])
-            .leftJoinAndSelect('user.tenant', 'tenant')
-            .skip((currentPage - 1) * pageSize)
-            .take(pageSize)
-            .orderBy('user.id', 'DESC')
-            .getManyAndCount();
-        return users;
+        try {
+            const users = await queryBuilder
+                .select([
+                    'user.id',
+                    'user.firstName',
+                    'user.lastName',
+                    'user.email',
+                    'user.role',
+                    'user.createdAt',
+                ])
+                .leftJoinAndSelect('user.tenant', 'tenant')
+                .skip((currentPage - 1) * pageSize)
+                .take(pageSize)
+                .orderBy('user.id', 'DESC')
+                .getManyAndCount();
+            return users;
+        } catch (err) {
+            throw createHttpError(500, 'Error retrieving users');
+        }
     }
 
-    // Delete a user by Id
+    // Delete a user by id
     async deleteUser(userId: number) {
-        return await this.userRepository.delete(userId);
+        try {
+            const result = await this.userRepository.delete(userId);
+            if (result.affected === 0) {
+                throw createHttpError(404, 'User not found');
+            }
+            return result;
+        } catch (err) {
+            throw createHttpError(500, 'Error deleting user');
+        }
     }
 }

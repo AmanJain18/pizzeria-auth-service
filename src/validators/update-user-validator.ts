@@ -1,16 +1,25 @@
 import { checkSchema } from 'express-validator';
 import { UpdateUserRequest } from '../types';
+import { Roles } from '../constants';
 
 export default checkSchema({
     firstName: {
         errorMessage: 'First name is required!',
         notEmpty: true,
         trim: true,
+        isLength: {
+            options: { min: 2 },
+            errorMessage: 'First name must be at least 2 characters long',
+        },
     },
     lastName: {
         errorMessage: 'Last name is required!',
         notEmpty: true,
         trim: true,
+        isLength: {
+            options: { min: 2 },
+            errorMessage: 'Last name must be at least 2 characters long',
+        },
     },
     email: {
         trim: true,
@@ -24,22 +33,26 @@ export default checkSchema({
             errorMessage: 'Invalid email',
         },
     },
+    role: {
+        errorMessage: 'Role is required',
+        notEmpty: true,
+        trim: true,
+    },
     tenantId: {
         errorMessage: 'Tenant Id is required',
         trim: true,
         custom: {
             options: (value: string, { req }) => {
                 const role = (req as UpdateUserRequest).body.role;
-                if (role === 'admin') {
-                    return true;
+                if (role !== Roles.ADMIN) {
+                    if (!value) {
+                        throw new Error(
+                            'Tenant Id is required for non-admin roles',
+                        );
+                    }
                 }
-                return !!value;
+                return true;
             },
         },
-    },
-    role: {
-        errorMessage: 'Role is required',
-        notEmpty: true,
-        trim: true,
     },
 });

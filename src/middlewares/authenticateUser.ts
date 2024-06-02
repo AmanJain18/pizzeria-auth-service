@@ -12,18 +12,21 @@ export default expressjwt({
     }) as GetVerificationKey,
     algorithms: ['RS256'],
     getToken(req: Request) {
-        const authHeader = req.headers.authorization;
-
-        // Check if the token is in the Authorization header or in the cookie
-        // Bearer token format is: Bearer <token>
-        if (authHeader && authHeader.split(' ')[1] !== 'undefined') {
-            const token = authHeader.split(' ')[1];
-            if (token) {
-                return token;
+        try {
+            const authHeader = req.headers.authorization;
+            // Check if the token is in the Authorization header or in the cookie
+            // Bearer token format is: Bearer <token>
+            if (authHeader && authHeader.split(' ')[1] !== 'undefined') {
+                const token = authHeader.split(' ')[1];
+                if (token) {
+                    return token;
+                }
             }
-        }
 
-        const { accessToken } = req.cookies as AuthCookie;
-        return accessToken;
+            const { accessToken } = req.cookies as AuthCookie;
+            return accessToken;
+        } catch (err) {
+            throw new Error('Error retrieving token');
+        }
     },
 });

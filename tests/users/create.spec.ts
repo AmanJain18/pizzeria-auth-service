@@ -27,7 +27,7 @@ describe('POST /users', () => {
                 email: 'test@gmail.com',
                 password: 'Test@1234',
                 tenantId: tenant.id,
-                role: Roles.Manager,
+                role: Roles.MANAGER,
             };
 
             // Act
@@ -60,7 +60,7 @@ describe('POST /users', () => {
                 email: 'test@gmail.com',
                 password: 'Test@1234',
                 tenantId: tenant.id,
-                role: Roles.Manager,
+                role: Roles.MANAGER,
             };
 
             // Act
@@ -97,7 +97,7 @@ describe('POST /users', () => {
                 email: 'test@gmail.com',
                 password: 'Test@1234',
                 tenantId: tenant.id,
-                role: Roles.Manager,
+                role: Roles.MANAGER,
             };
 
             // Act
@@ -111,7 +111,7 @@ describe('POST /users', () => {
 
             // Assert
             expect(users).toHaveLength(1);
-            expect(users[0].role).toBe(Roles.Manager);
+            expect(users[0].role).toBe(Roles.MANAGER);
         });
 
         it('should return status code 401 if user is not authenticated', async () => {
@@ -128,7 +128,7 @@ describe('POST /users', () => {
                 email: 'test@gmail.com',
                 password: 'Test@1234',
                 tenantId: tenant.id,
-                role: Roles.Manager,
+                role: Roles.MANAGER,
             };
 
             // Act
@@ -162,7 +162,7 @@ describe('POST /users', () => {
                 email: 'test@gmail.com',
                 password: 'Test@1234',
                 tenantId: tenant.id,
-                role: Roles.Manager,
+                role: Roles.MANAGER,
             };
 
             // Act
